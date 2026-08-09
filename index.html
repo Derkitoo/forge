@@ -77,7 +77,7 @@
 
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
-  /* ---------- Header ultra épuré ---------- */
+  /* ---------- Header ---------- */
   .topbar {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
     padding: 14px 28px; background: var(--surface); border-bottom: 1px solid var(--line);
@@ -135,7 +135,7 @@
   .detail { overflow-y: auto; background: var(--surface); min-height: 0; flex: 1; }
   .detail-inner { max-width: 760px; padding: 32px; margin: 0 auto; }
 
-  /* Accueil simple et accueillant */
+  /* Accueil simple */
   .welcome-box {
     text-align: center; max-width: 680px; margin: 40px auto; padding: 20px;
   }
@@ -158,7 +158,7 @@
   .q-name { font-weight: 600; font-size: 15px; color: var(--ink); }
   .q-sub { font-size: 12px; color: var(--muted); }
 
-  /* Detail Formulaire */
+  /* Formulaire */
   .form-group { margin-bottom: 22px; }
   .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; font-weight: 600; }
   .field {
@@ -181,22 +181,18 @@
     border-radius: 6px; padding: 10px 14px; font-size: 14px;
   }
 
+  .skill-chip {
+    border: 1px solid var(--line-strong); background: var(--surface-2); border-radius: 20px;
+    padding: 6px 14px; font-size: 12.5px; cursor: pointer; transition: all .15s;
+    display: inline-flex; align-items: center; gap: 6px; font-weight: 500;
+  }
+  .skill-chip:hover { border-color: var(--accent); }
+  .skill-chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; }
+
   .preview-card {
     border: 1px solid var(--line-strong); background: var(--surface-2); border-radius: var(--r);
     padding: 18px; font-family: var(--mono); font-size: 13px; line-height: 1.6;
     white-space: pre-wrap; word-break: break-word; color: var(--ink); margin-bottom: 24px;
-  }
-
-  /* Wireframe Studio CSS */
-  .wf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-  .wf-item {
-    border: 1px solid var(--line-strong); background: var(--surface-2); padding: 12px;
-    border-radius: var(--r); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13.5px;
-  }
-  .wf-item.active { border-color: var(--accent); background: var(--accent-wash); font-weight: 600; color: var(--accent-ink); }
-  .wf-preview-canvas {
-    border: 2px dashed var(--line-strong); background: var(--surface-2); border-radius: var(--r);
-    padding: 16px; min-height: 140px; margin-bottom: 16px; font-family: var(--mono); font-size: 12px; color: var(--muted);
   }
 
   .toast {
@@ -219,7 +215,7 @@
     .detail { display: none; }
     .app.open .listpane { display: none; }
     .app.open .detail { display: block; }
-    .steps-grid, .quick-cards, .wf-grid { grid-template-columns: 1fr; }
+    .steps-grid, .quick-cards { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -229,13 +225,14 @@
     <div class="brand" id="go-home">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"><path d="M2 12h20M7 12V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
       <h1>PromptForge</h1>
-      <span class="tag">Studio IA</span>
+      <span class="tag">Pro Skills</span>
     </div>
     <div class="top-btns">
       <button class="btn btn-primary" id="btn-coach">🧠 Demande guidée</button>
-      <button class="btn" id="btn-wireframe">🎨 Studio Wireframe</button>
+      <button class="btn" id="btn-skills">📦 Mes Skills Pro</button>
+      <button class="btn" id="btn-wireframe">🎨 Wireframe</button>
       <button class="btn" id="btn-gallery">💡 Modèles</button>
-      <button class="btn" id="btn-scan" title="Scanner un dossier projet">📁 Scanner</button>
+      <button class="btn" id="btn-scan">📁 Scanner</button>
       <button class="btn" id="btn-theme" title="Changer le thème">🌙 Thème</button>
       <button class="btn" id="btn-open-api" title="Configurer l'IA">⚙️ Clés</button>
     </div>
@@ -258,6 +255,37 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Modal Gestionnaire & Importateur de Skills Pro -->
+<div class="modal-overlay" id="modal-skills" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>📦 Importateur & Hub de Skills Pro</h3>
+      <button class="btn btn-ghost" id="m-close-skills">✕</button>
+    </div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:14px;">Importez n'importe quel Skill ou System Prompt récupéré ailleurs (GitHub, Reddit, Twitter, fichiers `.md`) :</p>
+    
+    <div style="border:1px dashed var(--accent); background:var(--accent-wash); border-radius:var(--r); padding:16px; margin-bottom:20px;">
+      <div style="font-weight:600; font-size:14px; color:var(--accent-ink); margin-bottom:10px;">📥 Importer / Coller un nouveau Skill</div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <input class="field" id="sk-name" placeholder="Nom du Skill (ex: Mon Skill Supabase Pro, Expert Python...)">
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <textarea class="field" id="sk-rules" rows="4" placeholder="Collez le contenu du Skill, les consignes ou le prompt système ici..."></textarea>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:space-between; align-items:center;">
+        <label class="btn" style="cursor:pointer;">
+          📁 Téléverser fichier (.md, .txt, .json)
+          <input type="file" id="sk-file-input" accept=".md,.txt,.json,.yaml" hidden>
+        </label>
+        <button class="btn btn-primary" id="sk-save-btn">💾 Enregistrer ce Skill</button>
+      </div>
+    </div>
+
+    <label class="lbl">Bibliothèque de Skills Disponibles</label>
+    <div id="skills-list-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+  </div>
+</div>
+
 <!-- Modal Studio Wireframe Visuel -->
 <div class="modal-overlay" id="modal-wireframe" hidden>
   <div class="modal-card">
@@ -267,7 +295,7 @@
     </div>
     <p style="font-size:14px; color:var(--muted); margin-bottom:14px;">Sélectionnez les composants visuels à inclure dans votre maquette :</p>
     
-    <div class="wf-grid">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:16px;">
       <div class="wf-item active" data-wf="navbar">📌 En-tête Navigation (Navbar)</div>
       <div class="wf-item active" data-wf="hero">🚀 Bandeau d'Accroche (Hero Banner)</div>
       <div class="wf-item active" data-wf="cards">🗂️ Grille de Cartes (Card Grid)</div>
@@ -277,9 +305,7 @@
     </div>
 
     <label class="lbl">Aperçu Visuel de la Maquette</label>
-    <div class="wf-preview-canvas" id="wf-canvas">
-      [Header Navbar] ─── [Hero Accroche] ─── [Grille de Cartes]
-    </div>
+    <div id="wf-canvas" style="border:2px dashed var(--line-strong); background:var(--surface-2); border-radius:var(--r); padding:16px; min-height:100px; margin-bottom:16px; font-family:var(--mono); font-size:12px;"></div>
 
     <div style="display:flex; justify-content:flex-end; gap:10px;">
       <button class="btn btn-primary" id="wf-generate">✨ Générer le Prompt Maquette UI</button>
@@ -379,6 +405,7 @@
   var KEY = "promptforge.simple.v1";
   var KEY_API = "promptforge.api_config.v1";
   var KEY_THEME = "promptforge.theme.v1";
+  var KEY_CUSTOM_SKILLS = "promptforge.custom_skills.v1";
 
   var DEFAULT_MODELS = {
     gemini: "gemini-1.5-flash",
@@ -387,6 +414,33 @@
     groq: "llama-3.3-70b-versatile",
     openrouter: "deepseek/deepseek-r1:free"
   };
+
+  var PRO_SKILLS = [
+    {
+      id: "skill-senior-dev",
+      nom: "Senior Fullstack Dev",
+      icon: "💻",
+      rules: "- Écrire du code propre, moderne, modulaire et directement exécutable.\n- Respecter l'architecture du projet et ne jamais faire de patchs ou raccourcis superficiels.\n- Inclure la gestion des erreurs et des cas limites."
+    },
+    {
+      id: "skill-ux-designer",
+      nom: "UX/UI Designer Pro",
+      icon: "🎨",
+      rules: "- Concevoir des interfaces esthétiques, épurées et ultra-réactives (Glassmorphism, animations fluides, contrastes parfaits).\n- Utiliser une typographie moderne et un design responsive mobile-first."
+    },
+    {
+      id: "skill-root-cause",
+      nom: "Root Cause Debugger",
+      icon: "🔍",
+      rules: "- Inspecter la cause racine avant d'apporter la moindre modification.\n- Analyser les logs et tracebacks complets au lieu d'avaler les exceptions."
+    },
+    {
+      id: "skill-anthropic",
+      nom: "Standard Anthropic/Claude",
+      icon: "🤖",
+      rules: "- Structurer la réponse avec un objectif clair, le contexte du projet, les contraintes et le format attendu.\n- Réfléchir étape par étape avant d'écrire la solution."
+    }
+  ];
 
   var PRESETS = [
     {
@@ -426,6 +480,7 @@
   var state = {
     specs: [], sel: null, q: "",
     apiCfg: { provider: "gemini", model: "gemini-1.5-flash", key: "" },
+    customSkills: [],
     wf: { navbar: true, hero: true, cards: true, form: false, table: false, footer: false }
   };
 
@@ -462,6 +517,11 @@
         var cfg = JSON.parse(rawApi);
         if (cfg) state.apiCfg = cfg;
       }
+      var rawSk = localStorage.getItem(KEY_CUSTOM_SKILLS);
+      if (rawSk) {
+        var sks = JSON.parse(rawSk);
+        if (Array.isArray(sks)) state.customSkills = sks;
+      }
     } catch (e) {}
 
     if (state.apiCfg && (state.apiCfg.provider === "gemini" || !state.apiCfg.provider) && state.apiCfg.model === "gemini-2.0-flash") {
@@ -472,7 +532,7 @@
 
     if (!state.specs.length) {
       state.specs = PRESETS.map(function (p) {
-        return { id: p.id, nom: p.nom, desc: p.desc, icon: p.icon, template: p.template, values: p.values || {} };
+        return { id: p.id, nom: p.nom, desc: p.desc, icon: p.icon, template: p.template, values: p.values || {}, activeSkills: ["skill-senior-dev"] };
       });
       sauver();
     }
@@ -482,7 +542,12 @@
     try {
       localStorage.setItem(KEY, JSON.stringify({ specs: state.specs }));
       localStorage.setItem(KEY_API, JSON.stringify(state.apiCfg));
+      localStorage.setItem(KEY_CUSTOM_SKILLS, JSON.stringify(state.customSkills));
     } catch (e) {}
+  }
+
+  function getAllSkills() {
+    return PRO_SKILLS.concat(state.customSkills || []);
   }
 
   function detectVars(tpl) {
@@ -496,9 +561,22 @@
   function compileSpec(spec) {
     var tpl = spec.template || "";
     var vals = spec.values || {};
-    return tpl.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, function (m, key) {
+    var base = tpl.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, function (m, key) {
       return vals[key] !== undefined && vals[key] !== "" ? vals[key] : "{{" + key + "}}";
     });
+
+    if (spec.activeSkills && spec.activeSkills.length) {
+      var allSk = getAllSkills();
+      var activeRules = [];
+      spec.activeSkills.forEach(function (skId) {
+        var found = allSk.find(function(x){ return x.id === skId; });
+        if (found) activeRules.push("### " + (found.icon || "⚡") + " Skill: " + found.nom + "\n" + found.rules);
+      });
+      if (activeRules.length) {
+        base += "\n\n## 📦 Directives & Skills Pro Appliqués\n" + activeRules.join("\n\n");
+      }
+    }
+    return base;
   }
 
   function renderListe() {
@@ -520,11 +598,11 @@
     var d = document.getElementById("detail");
     d.innerHTML = "<div class='welcome-box'>" +
       "<h2>Bienvenue sur PromptForge 👋</h2>" +
-      "<p>L'outil le plus simple pour créer des demandes parfaites et tester directement avec l'IA.</p>" +
+      "<p>L'outil le plus simple pour créer des demandes parfaites, injecter des Skills Pro et tester avec l'IA.</p>" +
 
       "<div class='steps-grid'>" +
         "<div class='step-card'><div class='step-num'>ÉTAPE 1</div><div class='step-title'>Choisis un modèle</div><div class='step-desc'>Sélectionne un modèle prêt à l'emploi à gauche ou dans la galerie.</div></div>" +
-        "<div class='step-card'><div class='step-num'>ÉTAPE 2</div><div class='step-title'>Remplis les cases</div><div class='step-desc'>Renseigne les quelques informations demandées dans le formulaire.</div></div>" +
+        "<div class='step-card'><div class='step-num'>ÉTAPE 2</div><div class='step-title'>Empile des Skills Pro</div><div class='step-desc'>Active les compétences d'experts (Dev, UX, Debug, Anthropic) ou importe les tiennes.</div></div>" +
         "<div class='step-card'><div class='step-num'>ÉTAPE 3</div><div class='step-title'>Copie ou Teste</div><div class='step-desc'>Copie le texte ou teste-le en direct avec Gemini / Mistral / Ollama !</div></div>" +
       "</div>" +
 
@@ -545,9 +623,11 @@
     var s = state.specs.find(function (x) { return x.id === state.sel; });
     if (!s) { renderHome(); return; }
 
+    s.activeSkills = s.activeSkills || [];
     var vars = detectVars(s.template);
     var compiled = compileSpec(s);
     var provName = state.apiCfg.provider || "IA";
+    var allSk = getAllSkills();
 
     var h = "<div class='detail-inner'>";
     h += "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;'>" +
@@ -556,7 +636,21 @@
          "</div>";
 
     h += "<h2 style='font-family:var(--display); font-size:28px; margin-bottom:6px;'>" + (s.icon || "📋") + " " + esc(s.nom) + "</h2>";
-    h += "<p style='color:var(--muted); margin-bottom:24px; font-size:14px;'>" + esc(s.desc || "") + "</p>";
+    h += "<p style='color:var(--muted); margin-bottom:20px; font-size:14px;'>" + esc(s.desc || "") + "</p>";
+
+    // Section Skills Empilables
+    h += "<div class='form-group'>" +
+           "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;'>" +
+             "<span class='lbl' style='margin:0;'>📦 Injecter des Skills Pro dans ce Prompt</span>" +
+             "<button class='btn btn-ghost' id='btn-open-skills-modal' style='height:26px; font-size:11.5px;'>+ Importer un Skill</button>" +
+           "</div>" +
+           "<div style='display:flex; flex-wrap:wrap; gap:8px;'>" +
+             allSk.map(function(sk) {
+               var isAct = s.activeSkills.indexOf(sk.id) !== -1;
+               return "<button class='skill-chip " + (isAct ? "active" : "") + "' data-toggle-skill='" + sk.id + "'>" + (sk.icon || "⚡") + " " + esc(sk.nom) + "</button>";
+             }).join("") +
+           "</div>" +
+         "</div>";
 
     if (vars.length > 0) {
       h += "<div class='vars-box'>" +
@@ -572,7 +666,7 @@
     }
 
     h += "<div class='form-group'>" +
-           "<span class='lbl'>Votre Texte Prêt à l'Emploi</span>" +
+           "<span class='lbl'>Votre Texte Prêt à l'Emploi (avec Skills)</span>" +
            "<div class='preview-card' id='preview-box'>" + esc(compiled) + "</div>" +
          "</div>";
 
@@ -594,6 +688,22 @@
     d.innerHTML = h;
     d.scrollTop = 0;
 
+    Array.prototype.forEach.call(d.querySelectorAll("[data-toggle-skill]"), function (btn) {
+      btn.addEventListener("click", function () {
+        var skId = btn.getAttribute("data-toggle-skill");
+        var idx = s.activeSkills.indexOf(skId);
+        if (idx === -1) s.activeSkills.push(skId);
+        else s.activeSkills.splice(idx, 1);
+        sauver(); renderDetail();
+      });
+    });
+
+    var btnOpenSkModal = document.getElementById("btn-open-skills-modal");
+    if (btnOpenSkModal) btnOpenSkModal.addEventListener("click", function() {
+      renderSkillsList();
+      document.getElementById("modal-skills").hidden = false;
+    });
+
     Array.prototype.forEach.call(d.querySelectorAll("[data-var]"), function (inp) {
       inp.addEventListener("input", function () {
         var k = inp.getAttribute("data-var");
@@ -607,7 +717,7 @@
       var text = compileSpec(s);
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text);
-        toast("✨ Texte copié ! Vous pouvez le coller dans votre IA.");
+        toast("✨ Texte copié avec les Skills Pro !");
       }
     });
 
@@ -663,7 +773,7 @@
               txtEl.textContent = "🔄 Le modèle " + targetModel + " est restreint. Bascule automatique sur gemini-1.5-flash...";
               tenterRequeteGemini("gemini-1.5-flash");
             } else {
-              txtEl.textContent = "❌ Erreur Gemini (" + targetModel + ") : " + data.error.message + "\n\nAstuce : essayez de changer le modèle pour 'gemini-1.5-flash' dans ⚙️ Clés IA.";
+              txtEl.textContent = "❌ Erreur Gemini (" + targetModel + ") : " + data.error.message;
             }
           } else {
             txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
@@ -725,6 +835,73 @@
     };
   }
 
+  /* Skills Hub Logic */
+  function renderSkillsList() {
+    var container = document.getElementById("skills-list-container");
+    if (!container) return;
+    var all = getAllSkills();
+    container.innerHTML = all.map(function(sk) {
+      var isCustom = sk.id.indexOf("custom-") === 0;
+      return "<div style='background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r); padding:12px; display:flex; justify-content:space-between; align-items:flex-start;'>" +
+        "<div>" +
+          "<div style='font-weight:600; font-size:14px;'>" + (sk.icon || "⚡") + " " + esc(sk.nom) + "</div>" +
+          "<div style='font-family:var(--mono); font-size:11.5px; color:var(--muted); white-space:pre-wrap; margin-top:4px;'>" + esc(sk.rules) + "</div>" +
+        "</div>" +
+        (isCustom ? "<button class='btn btn-ghost' style='color:var(--danger); height:26px;' data-del-skill='" + sk.id + "'>Supprimer</button>" : "<span style='font-size:10px; font-family:var(--mono); background:var(--accent-wash); color:var(--accent); padding:2px 6px; border-radius:4px;'>Officiel</span>") +
+      "</div>";
+    }).join("");
+
+    Array.prototype.forEach.call(container.querySelectorAll("[data-del-skill]"), function(btn) {
+      btn.addEventListener("click", function() {
+        var skId = btn.getAttribute("data-del-skill");
+        state.customSkills = state.customSkills.filter(function(x){ return x.id !== skId; });
+        sauver(); renderSkillsList();
+        if (state.sel) renderDetail();
+        toast("Skill supprimé.");
+      });
+    });
+  }
+
+  document.getElementById("btn-skills").addEventListener("click", function() {
+    renderSkillsList();
+    document.getElementById("modal-skills").hidden = false;
+  });
+  document.getElementById("m-close-skills").addEventListener("click", function() {
+    document.getElementById("modal-skills").hidden = true;
+  });
+
+  document.getElementById("sk-save-btn").addEventListener("click", function() {
+    var name = document.getElementById("sk-name").value.trim();
+    var rules = document.getElementById("sk-rules").value.trim();
+    if (!name || !rules) {
+      toast("Veuillez saisir un nom et les consignes du skill.");
+      return;
+    }
+    var sk = { id: "custom-" + uid(), nom: name, icon: "📦", rules: rules };
+    state.customSkills.unshift(sk);
+    sauver();
+    document.getElementById("sk-name").value = "";
+    document.getElementById("sk-rules").value = "";
+    renderSkillsList();
+    if (state.sel) renderDetail();
+    toast("✨ Nouveau Skill « " + name + " » enregistré !");
+  });
+
+  document.getElementById("sk-file-input").addEventListener("change", function() {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function() {
+      var content = String(reader.result || "").trim();
+      var name = file.name.replace(/\.[^/.]+$/, "");
+      document.getElementById("sk-name").value = name;
+      document.getElementById("sk-rules").value = content;
+      toast("Fichier Skill « " + file.name + " » chargé dans le formulaire !");
+    };
+    reader.readAsText(file);
+    this.value = "";
+  });
+
   /* Wireframe Logic */
   function renderWfCanvas() {
     var c = document.getElementById("wf-canvas");
@@ -768,7 +945,7 @@
     var s = {
       id: uid(), icon: "🎨", nom: "Maquette UI Web", desc: listComp.length + " composants visuels",
       template: "Tu es un développeur & designer Web expert.\n\nObjectif :\nCréer l'interface web responsive intégrant la structure visuelle suivante :\n\nComposants UI requis :\n" + listComp.map(function(c){ return "- " + c; }).join("\n") + "\n\nDirectives :\n- Design moderne, propre et accessible.\n- Code HTML5 sémantique avec styles CSS modernes.\n- Interactions fluides et réactives.",
-      values: {}
+      values: {}, activeSkills: ["skill-ux-designer"]
     };
 
     state.specs.unshift(s); state.sel = s.id;
@@ -816,7 +993,7 @@
     var s = {
       id: uid(), icon: "🧠", nom: "Demande " + intent, desc: area,
       template: "Tu es un développeur expert.\n\nObjectif : " + intent + " dans la section " + area + ".\n\nDescription du besoin :\n" + idea + "\n\nContraintes :\n- Conserver le code existant.\n- Rendre le résultat clair et testable.",
-      values: {}
+      values: {}, activeSkills: ["skill-senior-dev", "skill-anthropic"]
     };
     state.specs.unshift(s); state.sel = s.id;
     document.getElementById("modal-coach").hidden = true;
@@ -843,7 +1020,7 @@
     var idx = +card.getAttribute("data-gallery-idx");
     var p = PRESETS[idx];
     if (p) {
-      var s = { id: uid(), icon: p.icon, nom: p.nom, desc: p.desc, template: p.template, values: JSON.parse(JSON.stringify(p.values || {})) };
+      var s = { id: uid(), icon: p.icon, nom: p.nom, desc: p.desc, template: p.template, values: JSON.parse(JSON.stringify(p.values || {})), activeSkills: ["skill-senior-dev"] };
       state.specs.unshift(s); state.sel = s.id;
       document.getElementById("modal-gallery").hidden = true;
       sauver(); renderListe(); renderDetail();
@@ -887,7 +1064,8 @@
       var s = {
         id: uid(), icon: "📁", nom: "Projet " + folderName, desc: files.length + " fichiers scannés",
         template: "Tu es un développeur expert.\nAnalyse le projet {{nom_projet}} ({{nb_fichiers}} fichiers scannés).\n\nObjectif :\nDevelopper les fonctionnalités en respectant la structure du projet.",
-        values: { nom_projet: folderName, nb_fichiers: String(files.length) }
+        values: { nom_projet: folderName, nb_fichiers: String(files.length) },
+        activeSkills: ["skill-senior-dev", "skill-root-cause"]
       };
       state.specs.unshift(s); state.sel = s.id;
       sauver(); renderListe(); renderDetail();
