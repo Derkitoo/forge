@@ -8,6 +8,11 @@
 <meta http-equiv="Expires" content="0">
 <title>PromptForge &#8212; Studio &amp; Générateur IA Responsive</title>
 <link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PromptForge">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="theme-color" content="#0C6B63">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -274,6 +279,7 @@
       <button class="btn" id="btn-wireframe">🎨 Wireframe</button>
       <button class="btn" id="btn-gallery">💡 Modèles</button>
       <button class="btn" id="btn-scan">📁 Scanner</button>
+      <button class="btn" id="btn-pwa-install" hidden style="border-color:var(--accent); color:var(--accent-ink); font-weight:600;">📲 Installer App</button>
       <button class="btn" id="btn-theme" title="Changer le thème">🌙 Thème</button>
       <button class="btn" id="btn-open-api" title="Configurer l'IA">⚙️ Clés</button>
     </div>
@@ -310,6 +316,10 @@
       <button class="btn btn-ghost" id="m-close-mob-menu">✕</button>
     </div>
     <div class="m-menu-grid">
+      <button class="m-menu-item" id="mob-act-pwa-install" hidden style="background:var(--accent-wash); border-color:var(--accent); color:var(--accent-ink);">
+        <span class="m-menu-icon">📲</span>
+        <div><div>Installer l'Application PWA</div><div style="font-size:12px; color:var(--accent); font-weight:normal;">Ajouter à l'écran d'accueil</div></div>
+      </button>
       <button class="m-menu-item" id="mob-act-coach">
         <span class="m-menu-icon">🧠</span>
         <div><div>Créer une Demande Guidée</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Répondre à 2 questions simples</div></div>
@@ -1177,7 +1187,40 @@
     }
   });
 
-  /* PWA Service Worker Registration */
+  /* PWA Service Worker & Install Prompt */
+  var deferredPrompt;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var btnDesktop = document.getElementById("btn-pwa-install");
+    var btnMobile = document.getElementById("mob-act-pwa-install");
+    if (btnDesktop) btnDesktop.hidden = false;
+    if (btnMobile) btnMobile.hidden = false;
+  });
+
+  function declencherInstallationPWA() {
+    if (!deferredPrompt) {
+      toast("📱 Pour installer : Ouvrez le menu de votre navigateur (Chrome/Edge/Safari) et cliquez sur 'Ajouter à l'écran d'accueil'");
+      return;
+    }
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choiceResult) {
+      if (choiceResult.outcome === 'accepted') {
+        toast("🎉 Installation de PromptForge acceptée !");
+      }
+      deferredPrompt = null;
+      var btnDesktop = document.getElementById("btn-pwa-install");
+      var btnMobile = document.getElementById("mob-act-pwa-install");
+      if (btnDesktop) btnDesktop.hidden = true;
+      if (btnMobile) btnMobile.hidden = true;
+    });
+  }
+
+  var btnDesktop = document.getElementById("btn-pwa-install");
+  var btnMobile = document.getElementById("mob-act-pwa-install");
+  if (btnDesktop) btnDesktop.addEventListener("click", declencherInstallationPWA);
+  if (btnMobile) btnMobile.addEventListener("click", declencherInstallationPWA);
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('./sw.js').catch(function(){});
