@@ -6,16 +6,16 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>PromptForge &#8212; Générateur de Demandes IA Simple</title>
+<title>PromptForge &#8212; Studio & Générateur IA Responsive</title>
 <link rel="manifest" href="./manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --ground: #F4F6F5;
     --surface: #FFFFFF;
-    --surface-2: #F9FBFB;
+    --surface-2: #F8FAFA;
     --ink: #0E1A19;
     --ink-2: #3A4C4A;
     --muted: #6B7B79;
@@ -25,44 +25,47 @@
     --accent-ink: #085049;
     --accent-wash: #E8F4F2;
     --on-accent: #FFFFFF;
-    --shadow: 0 4px 20px rgba(14,26,25,.06);
+    --shadow-sm: 0 2px 8px rgba(14,26,25,.04);
+    --shadow: 0 8px 30px rgba(14,26,25,.08);
     --display: "Newsreader", Georgia, serif;
     --body: "Outfit", ui-sans-serif, sans-serif;
     --mono: "Fira Code", monospace;
-    --r: 10px;
+    --r: 12px;
   }
 
   [data-theme="dark"] {
-    --ground: #0D1413;
-    --surface: #151F1E;
-    --surface-2: #1B2726;
+    --ground: #0A1110;
+    --surface: #131D1C;
+    --surface-2: #192624;
     --ink: #E6ECEB;
     --ink-2: #B8C6C4;
     --muted: #889694;
-    --line: #24302E;
-    --line-strong: #364644;
+    --line: #22302D;
+    --line-strong: #334441;
     --accent: #4FBFAF;
     --accent-ink: #7FD6C8;
-    --accent-wash: #173330;
-    --on-accent: #06201D;
-    --shadow: 0 6px 24px rgba(0,0,0,.4);
+    --accent-wash: #15332F;
+    --on-accent: #05201C;
+    --shadow-sm: 0 2px 10px rgba(0,0,0,.3);
+    --shadow: 0 10px 32px rgba(0,0,0,.6);
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ground: #0D1413;
-      --surface: #151F1E;
-      --surface-2: #1B2726;
+      --ground: #0A1110;
+      --surface: #131D1C;
+      --surface-2: #192624;
       --ink: #E6ECEB;
       --ink-2: #B8C6C4;
       --muted: #889694;
-      --line: #24302E;
-      --line-strong: #364644;
+      --line: #22302D;
+      --line-strong: #334441;
       --accent: #4FBFAF;
       --accent-ink: #7FD6C8;
-      --accent-wash: #173330;
-      --on-accent: #06201D;
-      --shadow: 0 6px 24px rgba(0,0,0,.4);
+      --accent-wash: #15332F;
+      --on-accent: #05201C;
+      --shadow-sm: 0 2px 10px rgba(0,0,0,.3);
+      --shadow: 0 10px 32px rgba(0,0,0,.6);
     }
   }
 
@@ -77,26 +80,27 @@
 
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
-  /* ---------- Header ---------- */
+  /* ---------- Topbar Dynamic & Glassmorphic ---------- */
   .topbar {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 14px 28px; background: var(--surface); border-bottom: 1px solid var(--line);
-    z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--line);
+    z-index: 10; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
-  .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-  .brand h1 { font-family: var(--display); font-size: 24px; font-weight: 600; margin: 0; color: var(--ink); }
-  .brand .tag { font-family: var(--mono); font-size: 11px; background: var(--accent-wash); color: var(--accent); padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+  .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; flex-shrink: 0; }
+  .brand h1 { font-family: var(--display); font-size: 24px; font-weight: 600; margin: 0; color: var(--ink); letter-spacing: -.02em; }
+  .brand .tag { font-family: var(--mono); font-size: 10.5px; background: var(--accent-wash); color: var(--accent); padding: 3px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
 
-  .top-btns { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .top-btns { display: flex; gap: 8px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .top-btns::-webkit-scrollbar { display: none; }
 
   .btn {
-    height: 38px; padding: 0 16px; border-radius: var(--r); cursor: pointer;
+    height: 38px; padding: 0 14px; border-radius: var(--r); cursor: pointer;
     border: 1px solid var(--line-strong); background: var(--surface);
     font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;
-    transition: all .15s; white-space: nowrap; touch-action: manipulation;
+    transition: all .15s cubic-bezier(0,0,0.2,1); white-space: nowrap; touch-action: manipulation; flex-shrink: 0;
   }
-  .btn:hover { background: var(--surface-2); border-color: var(--muted); }
-  .btn:active { transform: scale(0.98); }
+  .btn:hover { background: var(--surface-2); border-color: var(--muted); transform: translateY(-1px); }
+  .btn:active { transform: scale(0.97); }
   .btn-primary {
     background: var(--accent); border-color: var(--accent);
     color: var(--on-accent); font-weight: 600; box-shadow: 0 2px 8px rgba(12,107,99,.25);
@@ -105,8 +109,8 @@
   .btn-ghost { border-color: transparent; background: none; color: var(--muted); }
   .btn-ghost:hover { background: var(--surface-2); color: var(--ink); }
 
-  /* ---------- Layout ---------- */
-  .panes { display: grid; grid-template-columns: minmax(300px, 340px) 1fr; flex: 1; min-height: 0; }
+  /* ---------- Layout Split Screen ---------- */
+  .panes { display: grid; grid-template-columns: minmax(300px, 360px) 1fr; flex: 1; min-height: 0; position: relative; }
   .listpane {
     display: flex; flex-direction: column; min-height: 0;
     border-right: 1px solid var(--line); background: var(--ground);
@@ -114,7 +118,7 @@
   .list-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
   .search-box {
     display: flex; align-items: center; gap: 8px; background: var(--surface);
-    border: 1px solid var(--line-strong); border-radius: var(--r); padding: 0 12px; height: 36px;
+    border: 1px solid var(--line-strong); border-radius: var(--r); padding: 0 12px; height: 38px;
   }
   .search-box input { border: 0; background: none; width: 100%; font-size: 13.5px; }
   .search-box input:focus { outline: none; }
@@ -123,99 +127,120 @@
   .card {
     width: 100%; text-align: left; cursor: pointer; display: block;
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--r); padding: 14px; margin-bottom: 8px;
-    transition: all .15s; position: relative;
+    border-radius: var(--r); padding: 14px 16px; margin-bottom: 8px;
+    transition: all .15s ease; position: relative;
   }
-  .card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .card:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
   .card[aria-current="true"] { border-color: var(--accent); background: var(--accent-wash); }
-  .card-title { font-family: var(--display); font-size: 16.5px; font-weight: 600; margin-bottom: 4px; color: var(--ink); }
-  .card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .card-title { font-family: var(--display); font-size: 17px; font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
-  /* ---------- Detail & Accueil ---------- */
-  .detail { overflow-y: auto; background: var(--surface); min-height: 0; flex: 1; }
-  .detail-inner { max-width: 760px; padding: 32px; margin: 0 auto; }
+  /* ---------- Detail & Studio ---------- */
+  .detail { overflow-y: auto; background: var(--surface); min-height: 0; flex: 1; scroll-behavior: smooth; }
+  .detail-inner { max-width: 800px; padding: 32px 36px 90px; margin: 0 auto; }
+
+  .mobile-nav-bar { display: none; margin-bottom: 16px; }
 
   /* Accueil simple */
-  .welcome-box {
-    text-align: center; max-width: 680px; margin: 40px auto; padding: 20px;
-  }
-  .welcome-box h2 { font-family: var(--display); font-size: 32px; font-weight: 600; margin-bottom: 10px; }
-  .welcome-box p { font-size: 16px; color: var(--muted); margin-bottom: 30px; line-height: 1.6; }
+  .welcome-box { text-align: center; max-width: 720px; margin: 20px auto 40px; padding: 10px; }
+  .welcome-box h2 { font-family: var(--display); font-size: 34px; font-weight: 600; margin-bottom: 12px; letter-spacing: -.02em; }
+  .welcome-box p { font-size: 16px; color: var(--muted); margin-bottom: 34px; line-height: 1.6; }
 
   .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; text-align: left; }
-  .step-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
-  .step-num { font-family: var(--mono); font-weight: 600; color: var(--accent); font-size: 13px; margin-bottom: 6px; }
+  .step-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; transition: transform .15s; }
+  .step-card:hover { transform: translateY(-2px); }
+  .step-num { font-family: var(--mono); font-weight: 600; color: var(--accent); font-size: 12px; margin-bottom: 6px; letter-spacing: .05em; }
   .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
-  .step-desc { font-size: 12.5px; color: var(--muted); }
+  .step-desc { font-size: 13px; color: var(--muted); line-height: 1.4; }
 
   .quick-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; text-align: left; }
   .q-card {
     background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r);
-    padding: 16px 18px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 14px;
+    padding: 18px 20px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 16px;
   }
   .q-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-  .q-icon { font-size: 28px; }
+  .q-icon { font-size: 30px; }
   .q-name { font-weight: 600; font-size: 15px; color: var(--ink); }
-  .q-sub { font-size: 12px; color: var(--muted); }
+  .q-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
 
-  /* Formulaire */
-  .form-group { margin-bottom: 22px; }
+  /* Formulaires & Visuals */
+  .form-group { margin-bottom: 24px; }
   .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; font-weight: 600; }
   .field {
     width: 100%; border: 1px solid var(--line-strong); background: var(--surface-2);
     border-radius: var(--r); padding: 12px 16px; font-size: 14.5px; transition: all .15s;
   }
   .field:focus { border-color: var(--accent); background: var(--surface); outline: none; box-shadow: 0 0 0 3px var(--accent-wash); }
-  textarea.field { resize: vertical; min-height: 100px; }
+  textarea.field { resize: vertical; min-height: 110px; }
 
   .vars-box {
     background: var(--accent-wash); border: 1px solid var(--accent);
-    border-radius: var(--r); padding: 20px; margin-bottom: 24px;
+    border-radius: var(--r); padding: 22px; margin-bottom: 24px; box-shadow: var(--shadow-sm);
   }
-  .vars-header { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent-ink); text-transform: uppercase; margin-bottom: 14px; }
-  .var-row { margin-bottom: 14px; }
+  .vars-header { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent-ink); text-transform: uppercase; margin-bottom: 16px; letter-spacing: .05em; }
+  .var-row { margin-bottom: 16px; }
   .var-row:last-child { margin-bottom: 0; }
-  .var-row label { display: block; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); margin-bottom: 5px; font-weight: 600; }
+  .var-row label { display: block; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); margin-bottom: 6px; font-weight: 600; }
   .var-row input {
     width: 100%; border: 1px solid var(--line-strong); background: var(--surface);
-    border-radius: 6px; padding: 10px 14px; font-size: 14px;
+    border-radius: 8px; padding: 10px 14px; font-size: 14px;
   }
 
   .skill-chip {
     border: 1px solid var(--line-strong); background: var(--surface-2); border-radius: 20px;
-    padding: 6px 14px; font-size: 12.5px; cursor: pointer; transition: all .15s;
-    display: inline-flex; align-items: center; gap: 6px; font-weight: 500;
+    padding: 7px 16px; font-size: 13px; cursor: pointer; transition: all .15s;
+    display: inline-flex; align-items: center; gap: 8px; font-weight: 500;
   }
-  .skill-chip:hover { border-color: var(--accent); }
-  .skill-chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; }
+  .skill-chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .skill-chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; box-shadow: 0 2px 6px rgba(12,107,99,.3); }
 
   .preview-card {
     border: 1px solid var(--line-strong); background: var(--surface-2); border-radius: var(--r);
-    padding: 18px; font-family: var(--mono); font-size: 13px; line-height: 1.6;
+    padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.6;
     white-space: pre-wrap; word-break: break-word; color: var(--ink); margin-bottom: 24px;
   }
+
+  .wf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 18px; }
+  .wf-item {
+    border: 1px solid var(--line-strong); background: var(--surface-2); padding: 14px;
+    border-radius: var(--r); cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13.5px; transition: all .15s;
+  }
+  .wf-item.active { border-color: var(--accent); background: var(--accent-wash); font-weight: 600; color: var(--accent-ink); }
 
   .toast {
     position: fixed; bottom: 28px; left: 50%; transform: translate(-50%, 20px);
     background: var(--ink); color: var(--ground); padding: 12px 24px; border-radius: 100px;
     font-size: 14px; font-weight: 500; box-shadow: var(--shadow); opacity: 0; pointer-events: none;
-    transition: all .2s; z-index: 50; font-family: var(--mono);
+    transition: all .25s ease; z-index: 50; font-family: var(--mono);
   }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
-  /* Modals */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
+  /* Modals Full Responsive */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
   .modal-overlay[hidden] { display: none; }
-  .modal-card { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); width: min(680px, 100%); padding: 24px; max-height: 90vh; overflow-y: auto; }
-  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .modal-head h3 { font-family: var(--display); font-size: 22px; margin: 0; }
+  .modal-card { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); width: min(720px, 100%); padding: 28px; max-height: 90vh; overflow-y: auto; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .modal-head h3 { font-family: var(--display); font-size: 24px; margin: 0; font-weight: 600; }
 
-  @media (max-width: 768px) {
+  /* ---------- Adaptabilité Mobile / Tablette (< 880px) ---------- */
+  @media (max-width: 880px) {
+    .topbar { padding: 10px 16px; }
+    .brand h1 { font-size: 20px; }
+    .brand .tag { display: none; }
     .panes { grid-template-columns: 1fr; }
     .detail { display: none; }
     .app.open .listpane { display: none; }
     .app.open .detail { display: block; }
-    .steps-grid, .quick-cards { grid-template-columns: 1fr; }
+
+    .mobile-nav-bar { display: block; }
+    .detail-inner { padding: 20px 16px 80px; }
+
+    .steps-grid, .quick-cards, .wf-grid { grid-template-columns: 1fr; }
+    .btn { height: 42px; padding: 0 16px; }
+    .q-card { padding: 16px; }
+
+    .modal-overlay { padding: 0; }
+    .modal-card { width: 100%; height: 100%; max-height: 100vh; border-radius: 0; padding: 20px 16px; }
   }
 </style>
 </head>
@@ -225,11 +250,11 @@
     <div class="brand" id="go-home">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"><path d="M2 12h20M7 12V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
       <h1>PromptForge</h1>
-      <span class="tag">Pro Skills</span>
+      <span class="tag">Responsive</span>
     </div>
     <div class="top-btns">
       <button class="btn btn-primary" id="btn-coach">🧠 Demande guidée</button>
-      <button class="btn" id="btn-skills">📦 Mes Skills Pro</button>
+      <button class="btn" id="btn-skills">📦 Skills Pro</button>
       <button class="btn" id="btn-wireframe">🎨 Wireframe</button>
       <button class="btn" id="btn-gallery">💡 Modèles</button>
       <button class="btn" id="btn-scan">📁 Scanner</button>
@@ -272,9 +297,9 @@
       <div class="form-group" style="margin-bottom:10px;">
         <textarea class="field" id="sk-rules" rows="4" placeholder="Collez le contenu du Skill, les consignes ou le prompt système ici..."></textarea>
       </div>
-      <div style="display:flex; gap:10px; justify-content:space-between; align-items:center;">
+      <div style="display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
         <label class="btn" style="cursor:pointer;">
-          📁 Téléverser fichier (.md, .txt, .json)
+          📁 Fichier (.md, .txt, .json)
           <input type="file" id="sk-file-input" accept=".md,.txt,.json,.yaml" hidden>
         </label>
         <button class="btn btn-primary" id="sk-save-btn">💾 Enregistrer ce Skill</button>
@@ -295,7 +320,7 @@
     </div>
     <p style="font-size:14px; color:var(--muted); margin-bottom:14px;">Sélectionnez les composants visuels à inclure dans votre maquette :</p>
     
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:16px;">
+    <div class="wf-grid">
       <div class="wf-item active" data-wf="navbar">📌 En-tête Navigation (Navbar)</div>
       <div class="wf-item active" data-wf="hero">🚀 Bandeau d'Accroche (Hero Banner)</div>
       <div class="wf-item active" data-wf="cards">🗂️ Grille de Cartes (Card Grid)</div>
@@ -322,7 +347,7 @@
     </div>
     <p style="font-size:14px; color:var(--muted); margin-bottom:18px;">Répondez à 2 questions simples pour générer un texte parfait pour l'IA.</p>
     
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:16px;">
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
       <div>
         <label class="lbl">Que voulez-vous faire ?</label>
         <select class="field" id="c-intent">
@@ -598,7 +623,7 @@
     var d = document.getElementById("detail");
     d.innerHTML = "<div class='welcome-box'>" +
       "<h2>Bienvenue sur PromptForge 👋</h2>" +
-      "<p>L'outil le plus simple pour créer des demandes parfaites, injecter des Skills Pro et tester avec l'IA.</p>" +
+      "<p>L'outil le plus simple et 100% responsive pour créer des demandes parfaites, injecter des Skills Pro et tester avec l'IA.</p>" +
 
       "<div class='steps-grid'>" +
         "<div class='step-card'><div class='step-num'>ÉTAPE 1</div><div class='step-title'>Choisis un modèle</div><div class='step-desc'>Sélectionne un modèle prêt à l'emploi à gauche ou dans la galerie.</div></div>" +
@@ -630,19 +655,21 @@
     var allSk = getAllSkills();
 
     var h = "<div class='detail-inner'>";
-    h += "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;'>" +
-           "<button class='btn btn-ghost' id='back'>← Retour</button>" +
-           "<button class='btn btn-ghost' id='btn-del' style='color:var(--danger)'>Supprimer</button>" +
+    h += "<div class='mobile-nav-bar'>" +
+           "<button class='btn btn-primary' id='back' style='width:100%; height:42px; justify-content:center;'>← Retour aux modèles</button>" +
          "</div>";
 
-    h += "<h2 style='font-family:var(--display); font-size:28px; margin-bottom:6px;'>" + (s.icon || "📋") + " " + esc(s.nom) + "</h2>";
+    h += "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;'>" +
+           "<h2 style='font-family:var(--display); font-size:28px; margin:0;'>" + (s.icon || "📋") + " " + esc(s.nom) + "</h2>" +
+           "<button class='btn btn-ghost' id='btn-del' style='color:var(--danger); height:32px;'>Supprimer</button>" +
+         "</div>";
     h += "<p style='color:var(--muted); margin-bottom:20px; font-size:14px;'>" + esc(s.desc || "") + "</p>";
 
     // Section Skills Empilables
     h += "<div class='form-group'>" +
-           "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;'>" +
+           "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;'>" +
              "<span class='lbl' style='margin:0;'>📦 Injecter des Skills Pro dans ce Prompt</span>" +
-             "<button class='btn btn-ghost' id='btn-open-skills-modal' style='height:26px; font-size:11.5px;'>+ Importer un Skill</button>" +
+             "<button class='btn btn-ghost' id='btn-open-skills-modal' style='height:28px; font-size:11.5px;'>+ Importer un Skill</button>" +
            "</div>" +
            "<div style='display:flex; flex-wrap:wrap; gap:8px;'>" +
              allSk.map(function(sk) {
