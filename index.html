@@ -65,7 +65,7 @@
 
   /* ---------- topbar ---------- */
   .topbar {
-    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
     padding: 12px 24px; background: var(--surface);
     border-bottom: 1px solid var(--line);
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -97,12 +97,12 @@
     transition: border-color .15s, box-shadow .15s;
   }
   .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
-  .search input { border: 0; background: none; width: 170px; font-size: 13px; }
+  .search input { border: 0; background: none; width: 150px; font-size: 13px; }
   .search input:focus { outline: none; }
   .search svg { width: 14px; height: 14px; color: var(--muted); flex: none; }
 
   .btn {
-    height: 34px; padding: 0 14px; border-radius: var(--r); cursor: pointer;
+    height: 34px; padding: 0 13px; border-radius: var(--r); cursor: pointer;
     border: 1px solid var(--line-strong); background: var(--surface);
     font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
     transition: background .12s, border-color .12s, transform .1s; white-space: nowrap;
@@ -119,12 +119,11 @@
   .btn-ghost:hover { background: var(--surface-2); color: var(--ink); }
   .btn-danger:hover { color: var(--danger); border-color: var(--danger); background: none; }
 
-  /* ---------- responsive layout ---------- */
+  /* ---------- layout ---------- */
   .panes { display: grid; grid-template-columns: minmax(320px, 380px) 1fr; flex: 1; min-height: 0; position: relative; }
   .listpane {
     display: flex; flex-direction: column; min-height: 0;
     border-right: 1px solid var(--line); background: var(--ground);
-    transition: transform .2s ease, opacity .2s ease;
   }
   .filters {
     display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
@@ -216,6 +215,13 @@
   textarea.field.mono { font-family: var(--mono); font-size: 12.5px; line-height: 1.6; }
   textarea.field:focus, input.field:focus { border-color: var(--accent); background: var(--surface); outline: none; }
 
+  .npm-launch-box {
+    border: 1px solid var(--line); background: var(--surface-2);
+    border-radius: var(--r); padding: 14px 16px; margin-bottom: 24px;
+  }
+  .npm-title { font-family: var(--mono); font-size: 11px; color: var(--brass); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin-bottom: 8px; }
+  .npm-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
   .vars-container {
     border: 1px solid var(--accent); background: var(--accent-wash);
     border-radius: var(--r); padding: 16px 18px; margin-bottom: 24px;
@@ -236,6 +242,13 @@
     white-space: pre-wrap; word-break: break-word; color: var(--ink-2); max-height: 360px; overflow-y: auto;
   }
 
+  .ai-response-container {
+    border: 1px solid var(--accent); background: var(--surface); border-radius: var(--r);
+    padding: 16px 18px; margin-top: 18px; box-shadow: var(--shadow);
+  }
+  .ai-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 600; }
+  .ai-text { font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: var(--ink); }
+
   .d-foot { display: flex; gap: 10px; margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--line); flex-wrap: wrap; }
 
   .toast {
@@ -246,7 +259,19 @@
   }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
-  /* ---------- MOBILE RESPONSIVE (MEDIA QUERIES) ---------- */
+  /* ---------- MODALS ---------- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(6,14,13,.6); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+  .modal-overlay[hidden] { display: none; }
+  .modal-card { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); width: min(720px, 100%); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-head { padding: 18px 24px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+  .modal-head h2 { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 0; }
+  .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .preset-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px; text-align: left; cursor: pointer; transition: border-color .15s, transform .15s; }
+  .preset-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .preset-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--ink); }
+  .preset-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
+
   @media (max-width: 880px) {
     .topbar { padding: 10px 14px; gap: 10px; }
     .brand h1 { font-size: 20px; }
@@ -292,11 +317,14 @@
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <input id="q" type="search" placeholder="Rechercher une spec&#8230;" aria-label="Rechercher">
       </label>
-      <button class="btn" id="btn-gallery" title="Voir les modèles prêts à l'emploi">&#128161; Galerie d'Exemples</button>
-      <button class="btn" id="btn-export" title="Exporter une sauvegarde de tes specs">Exporter JSON</button>
-      <button class="btn" id="btn-import" title="Recharger une sauvegarde">Importer JSON</button>
+      <button class="btn" id="btn-scan" title="Scanner un dossier projet local">📁 Scanner Dossier</button>
+      <button class="btn" id="btn-api-config" title="Configurer l'IA gratuite (Ollama local / Groq / Gemini)">🤖 Configuration IA</button>
+      <button class="btn" id="btn-gallery" title="Voir les modèles prêts à l'emploi">💡 Galerie</button>
+      <button class="btn" id="btn-export" title="Exporter JSON">Exporter</button>
+      <button class="btn" id="btn-import" title="Importer JSON">Importer</button>
       <button class="btn btn-primary" id="btn-new">+ Nouvelle Spec</button>
       <input type="file" id="file" accept="application/json,.json" hidden>
+      <input type="file" id="dir" webkitdirectory directory multiple hidden>
     </div>
   </header>
 
@@ -310,27 +338,48 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- Modal Galerie d'Exemples Prêts à l'emploi -->
-<style>
-  .modal-overlay { position: fixed; inset: 0; background: rgba(6,14,13,.6); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
-  .modal-overlay[hidden] { display: none; }
-  .modal-card { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); width: min(720px, 100%); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
-  .modal-head { padding: 18px 24px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
-  .modal-head h2 { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 0; }
-  .modal-body { padding: 16px 24px; overflow-y: auto; flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-  .preset-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px; text-align: left; cursor: pointer; transition: border-color .15s, transform .15s; }
-  .preset-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .preset-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--ink); }
-  .preset-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
-</style>
-
+<!-- Modal Galerie d'Exemples -->
 <div class="modal-overlay" id="modal-gallery" hidden>
   <div class="modal-card">
     <div class="modal-head">
       <h2>💡 Galerie d'Exemples Prêts à l'Emploi</h2>
-      <button class="btn btn-ghost" id="m-close">✕ Fermer</button>
+      <button class="btn btn-ghost" id="m-close-gallery">✕ Fermer</button>
     </div>
-    <div class="modal-body" id="gallery-list"></div>
+    <div class="modal-body">
+      <div class="gallery-grid" id="gallery-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Configuration IA (Ollama / Groq / OpenRouter / Gemini) -->
+<div class="modal-overlay" id="modal-api" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>🤖 Configuration IA Autonome (Gratuit & Local)</h2>
+      <button class="btn btn-ghost" id="m-close-api">✕ Fermer</button>
+    </div>
+    <div class="modal-body">
+      <div class="block">
+        <label class="lbl" for="cfg-provider">Fournisseur d'IA / API</label>
+        <select class="sel" id="cfg-provider" style="width:100%">
+          <option value="ollama">🦙 Ollama Local (http://localhost:11434) — 100% Gratuit & Hors-ligne</option>
+          <option value="groq">⚡ Groq Free API (https://api.groq.com/openai/v1) — Ultra Rapide</option>
+          <option value="openrouter">🌐 OpenRouter Free Tier (DeepSeek / Llama 3)</option>
+          <option value="gemini">🌟 Google Gemini API Key (Free Tier)</option>
+        </select>
+      </div>
+      <div class="block">
+        <label class="lbl" for="cfg-model">Modèle IA Sélectionné</label>
+        <input class="field" id="cfg-model" placeholder="ex: llama3, deepseek-r1, llama-3.3-70b-versatile...">
+      </div>
+      <div class="block">
+        <label class="lbl" for="cfg-key">Clé API (Inutile pour Ollama Local)</label>
+        <input class="field" id="cfg-key" type="password" placeholder="Collez votre clé API si nécessaire (gsk_..., AIzaSy...)">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-primary" id="cfg-save">Enregistrer la Configuration</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -339,6 +388,7 @@
   "use strict";
 
   var KEY = "promptforge.specs.v1";
+  var KEY_API = "promptforge.api_config.v1";
 
   var FORMATS = [
     { id: "claude-md", nom: "CLAUDE.md", ext: ".md", color: "#0C6B63" },
@@ -363,62 +413,55 @@
       id: "preset-architect",
       nom: "💻 Master Spec Agent (CLAUDE.md / AGENTS.md)",
       format: "claude-md",
-      description: "Sp\u00e9cification d'architecture et consignes de code pour les agents IA.",
-      template: "# Projet {{nom_projet}}\n\n## Vision & Objectif\n{{objectif_projet}}\n\n## Stack Technique\n- Langage & Framework : {{stack_technique}}\n- Style CSS : {{style_css}}\n\n## Directives Strictes pour l'Agent IA\n- Toujours respecter la structure du codebase existant.\n- V\u00e9rifier les lints et la syntaxe avant d'achever une t\u00e2che.\n- Ne jamais supprimer de code ou d'assertions sans autorisation.\n\n## Commandes de V\u00e9rification\n```bash\n{{commande_test}}\n```",
-      values: { nom_projet: "MonProjet", objectif_projet: "Cr\u00e9er une webapp ultra rapide et \u00e9l\u00e9gante", stack_technique: "HTML5, Vanilla JS", style_css: "Vanilla CSS Tokens", commande_test: "npm test" }
+      description: "Spécification d'architecture et consignes de code pour les agents IA.",
+      template: "# Projet {{nom_projet}}\n\n## Vision & Objectif\n{{objectif_projet}}\n\n## Stack Technique\n- Langage & Framework : {{stack_technique}}\n- Style CSS : {{style_css}}\n\n## Directives Strictes pour l'Agent IA\n- Toujours respecter la structure du codebase existant.\n- Vérifier les lints et la syntaxe avant d'achever une tâche.\n- Ne jamais supprimer de code ou d'assertions sans autorisation.\n\n## Commandes de Vérification\n```bash\n{{commande_test}}\n```",
+      values: { nom_projet: "MonProjet", objectif_projet: "Créer une webapp ultra rapide et élégante", stack_technique: "HTML5, Vanilla JS", style_css: "Vanilla CSS Tokens", commande_test: "npm test" }
     },
     {
       id: "preset-email",
-      nom: "✉️ R\u00e9daction d'Email Professionnel",
+      nom: "✉️ Rédaction d'Email Professionnel",
       format: "system-prompt",
-      description: "G\u00e9n\u00e9rateur d'emails professionnels convaincants avec ton sur-mesure.",
-      template: "R\u00e9dige un e-mail professionnel \u00e0 destination de {{destinataire}}.\n\nObjet de l'e-mail : {{sujet_email}}\n\nTon souhait\u00e9 : {{ton_souhaite}}\n\nPoints cl\u00e9s \u00e0 inclure :\n- {{point_1}}\n- {{point_2}}\n\nAppel \u00e0 l'action final : {{appel_action}}",
-      values: { destinataire: "M. le Directeur", sujet_email: "Proposition de partenariat", ton_souhaite: "professionnel et chaleureux", point_1: "Pr\u00e9sentation des r\u00e9sultats r\u00e9cents", point_2: "Proposition de rendez-vous de 15 min", appel_action: "Confirmer vos disponibilit\u00e9s pour cette semaine" }
+      description: "Générateur d'emails professionnels convaincants avec ton sur-mesure.",
+      template: "Rédige un e-mail professionnel à destination de {{destinataire}}.\n\nObjet de l'e-mail : {{sujet_email}}\n\nTon souhaité : {{ton_souhaite}}\n\nPoints clés à inclure :\n- {{point_1}}\n- {{point_2}}\n\nAppel à l'action final : {{appel_action}}",
+      values: { destinataire: "M. le Directeur", sujet_email: "Proposition de partenariat", ton_souhaite: "professionnel et chaleureux", point_1: "Présentation des résultats récents", point_2: "Proposition de rendez-vous de 15 min", appel_action: "Confirmer vos disponibilités pour cette semaine" }
     },
     {
       id: "preset-correction",
-      nom: "✍️ Correction & R\u00e9\u00e9criture de Texte",
+      nom: "✍️ Correction & Réécriture de Texte",
       format: "system-prompt",
-      description: "Corrige les fautes d'orthographe, grammaire et am\u00e9liore la fluidit\u00e9 du style.",
-      template: "Tu es un correcteur et r\u00e9dacteur professionnel.\n\nObjectif :\nCorriger les fautes et am\u00e9liorer la fluidit\u00e9 du texte suivant.\n\nNiveau de reformulation : {{niveau_reformulation}}\n\nTexte \u00e0 corriger :\n{{texte_brut}}",
-      values: { niveau_reformulation: "r\u00e9\u00e9criture fluide et naturelle", texte_brut: "Bonjour je vous contact car je voulait savoir si vous etiez dispo..." }
+      description: "Corrige les fautes d'orthographe, grammaire et améliore la fluidité du style.",
+      template: "Tu es un correcteur et rédacteur professionnel.\n\nObjectif :\nCorriger les fautes et améliorer la fluidité du texte suivant.\n\nNiveau de reformulation : {{niveau_reformulation}}\n\nTexte à corriger :\n{{texte_brut}}",
+      values: { niveau_reformulation: "réécriture fluide et naturelle", texte_brut: "Bonjour je vous contact car je voulait savoir si vous etiez dispo..." }
     },
     {
       id: "preset-resume",
-      nom: "📄 R\u00e9sum\u00e9 Synth\u00e9tique de Document",
+      nom: "📄 Résumé Synthétique de Document",
       format: "system-prompt",
-      description: "Extrait les id\u00e9es cl\u00e9s, d\u00e9cisions et actions d'un texte long.",
-      template: "Analyse le document suivant et fournis une synth\u00e8se structur\u00e9e.\n\nFormat de la r\u00e9ponse :\n1. R\u00e9sum\u00e9 en 3 puces principales.\n2. D\u00e9cisions cl\u00e9s identifi\u00e9es.\n3. Prochaines actions \u00e0 mener.\n\nSujet du document : {{sujet_doc}}\n\nContenu :\n{{contenu_doc}}",
-      values: { sujet_doc: "Compte-rendu de r\u00e9union produit", contenu_doc: "Collez votre texte long ici..." }
+      description: "Extrait les idées clés, décisions et actions d'un texte long.",
+      template: "Analyse le document suivant et fournis une synthèse structurée.\n\nFormat de la réponse :\n1. Résumé en 3 puces principales.\n2. Décisions clés identifiées.\n3. Prochaines actions à mener.\n\nSujet du document : {{sujet_doc}}\n\nContenu :\n{{contenu_doc}}",
+      values: { sujet_doc: "Compte-rendu de réunion produit", contenu_doc: "Collez votre texte long ici..." }
     },
     {
       id: "preset-social",
-      nom: "📣 G\u00e9n\u00e9rateur de Post LinkedIn / R\u00e9seaux",
+      nom: "📣 Générateur de Post LinkedIn / Réseaux",
       format: "system-prompt",
-      description: "R\u00e9dige un post percutant avec accroche et appel \u00e0 l'action.",
-      template: "R\u00e9dige un post percutant pour {{reseau_social}} sur le sujet : {{sujet_post}}.\n\nStructure :\n- Une accroche captivante (hook).\n- L'histoire ou la le\u00e7on en {{nb_lignes}} lignes.\n- 3 conseils pratiques.\n- Une question d'engagement \u00e0 la fin.",
-      values: { reseau_social: "LinkedIn", sujet_post: "L'importance de la simplicit\u00e9 dans les projets web", nb_lignes: "5" }
+      description: "Rédige un post percutant avec accroche et appel à l'action.",
+      template: "Rédige un post percutant pour {{reseau_social}} sur le sujet : {{sujet_post}}.\n\nStructure :\n- Une accroche captivante (hook).\n- L'histoire ou la leçon en {{nb_lignes}} lignes.\n- 3 conseils pratiques.\n- Une question d'engagement à la fin.",
+      values: { reseau_social: "LinkedIn", sujet_post: "L'importance de la simplicité dans les projets web", nb_lignes: "5" }
     },
     {
       id: "preset-refactor",
       nom: "🛠️ Agent Expert Refactoring & Code Clean",
       format: "system-prompt",
-      description: "Prompt syst\u00e8me pour r\u00e9organiser et optimiser du code legacy.",
-      template: "Tu es un expert en refactoring et architecture propre.\n\nContexte :\nAnalyse le code source du composant {{nom_composant}}.\n\nObjectif :\n1. Simplifier la fonction {{nom_fonction}}.\n2. \u00c9liminer la duplication de code sans modifier l'API publique.\n3. Ajouter de la gestion d'erreurs robuste.\n\nContraintes :\n- Conserver la r\u00e9trocompatibilit\u00e9.\n- Ne pas ajouter de d\u00e9pendances externes.",
+      description: "Prompt système pour réorganiser et optimiser du code legacy.",
+      template: "Tu es un expert en refactoring et architecture propre.\n\nContexte :\nAnalyse le code source du composant {{nom_composant}}.\n\nObjectif :\n1. Simplifier la fonction {{nom_fonction}}.\n2. Éliminer la duplication de code sans modifier l'API publique.\n3. Ajouter de la gestion d'erreurs robuste.\n\nContraintes :\n- Conserver la rétrocompatibilité.\n- Ne pas ajouter de dépendances externes.",
       values: { nom_composant: "UserProfile", nom_fonction: "renderUserData" }
-    },
-    {
-      id: "preset-ui-design",
-      nom: "🎨 Agent Design System & UI Craft",
-      format: "system-prompt",
-      description: "Prompt pour la cr\u00e9ation d'interfaces au style \u00c9ditorial Minimaliste.",
-      template: "Cr\u00e9e un composant UI {{type_composant}} en respectant le design system \u00c9ditorial Minimaliste.\n\nContraintes d'Aesthetique :\n- Titres en Serif (`Newsreader`, Georgia).\n- M\u00e9tadonn\u00e9es et badges en Monospace (`Fira Code`, uppercase).\n- Couleurs terreuses : Fond `#EDF0EF`, Texte `#0E1A19`, Accent \u00c9meraude `#0C6B63`.\n- Support automatique du dark mode via `prefers-color-scheme`.",
-      values: { type_composant: "Carte de Statistiques" }
     }
   ];
 
   var state = {
-    specs: [], sel: null, filtreFmt: "tous", q: "", modelId: "claude-3-7-sonnet"
+    specs: [], sel: null, filtreFmt: "tous", q: "", modelId: "claude-3-7-sonnet",
+    apiCfg: { provider: "ollama", model: "llama3", key: "" }
   };
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
@@ -443,23 +486,29 @@
       var raw = localStorage.getItem(KEY);
       if (raw) {
         var d = JSON.parse(raw);
-        if (d && Array.isArray(d.specs) && d.specs.length > 0) {
-          state.specs = d.specs;
-          return;
-        }
+        if (d && Array.isArray(d.specs) && d.specs.length > 0) state.specs = d.specs;
+      }
+      var rawApi = localStorage.getItem(KEY_API);
+      if (rawApi) {
+        var cfg = JSON.parse(rawApi);
+        if (cfg) state.apiCfg = cfg;
       }
     } catch (e) {}
-    state.specs = PRESETS.map(function (p) {
-      return {
-        id: p.id, nom: p.nom, format: p.format, description: p.description,
-        template: p.template, values: p.values || {}, majLe: new Date().toISOString()
-      };
-    });
-    sauver();
+    if (!state.specs.length) {
+      state.specs = PRESETS.map(function (p) {
+        return {
+          id: p.id, nom: p.nom, format: p.format, description: p.description,
+          template: p.template, values: p.values || {}, majLe: new Date().toISOString()
+        };
+      });
+      sauver();
+    }
   }
   function sauver() {
-    try { localStorage.setItem(KEY, JSON.stringify({ v: 1, specs: state.specs })); }
-    catch (e) { toast("Sauvegarde impossible dans le navigateur."); }
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, specs: state.specs }));
+      localStorage.setItem(KEY_API, JSON.stringify(state.apiCfg));
+    } catch (e) { toast("Sauvegarde impossible dans le navigateur."); }
   }
 
   function detectVars(tpl) {
@@ -529,7 +578,7 @@
     var ul = document.getElementById("list");
     var items = meFiltrees();
     if (!items.length) {
-      ul.innerHTML = "<li style='padding:30px 20px; text-align:center; color:var(--muted); font-size:13px;'>Aucune spec trouv\u00e9e.<br>Cliquez sur \u00ab + Nouvelle Spec \u00bb.</li>";
+      ul.innerHTML = "<li style='padding:30px 20px; text-align:center; color:var(--muted); font-size:13px;'>Aucune spec trouvée.<br>Cliquez sur « + Nouvelle Spec ».</li>";
       return;
     }
     ul.innerHTML = items.map(function (s) {
@@ -557,7 +606,7 @@
     if (!s) {
       d.innerHTML = "<div class='blank'>" +
         "<h2>Studio de Specs IA</h2>" +
-        "<p>S\u00e9lectionnez un mod\u00e8le de prompt \u00e0 gauche ou cr\u00e9ez-en un nouveau. PromptForge d\u00e9tectera automatiquement les variables <code>{{variable}}</code> pour g\u00e9n\u00e9rer des formulaires dynamiques.</p>" +
+        "<p>Sélectionnez un modèle de prompt à gauche ou créez-en un nouveau. PromptForge détectera automatiquement les variables <code>{{variable}}</code> pour générer des formulaires dynamiques.</p>" +
         "</div>";
       return;
     }
@@ -569,7 +618,7 @@
     var costStr = calcCost(tok, state.modelId);
 
     var h = "<div class='detail-inner'>";
-    h += "<div class='mobile-back-bar'><button class='btn btn-ghost' id='back'>\u2190 Retour aux specs</button></div>";
+    h += "<div class='mobile-back-bar'><button class='btn btn-ghost' id='back'>← Retour aux specs</button></div>";
     h += "<input class='name-input' id='f-nom' value='" + esc(s.nom) + "' placeholder='Nom de la spec (ex: Spec Claude Code)' aria-label='Nom'>";
 
     h += "<div class='row'>";
@@ -577,18 +626,26 @@
       return "<option value='" + f.id + "'" + (s.format === f.id ? " selected" : "") + ">" + f.nom + "</option>";
     }).join("") + "</select>";
 
-    h += "<select class='sel' id='f-model' aria-label='Mod\u00e8le IA'>" + MODELS.map(function (m) {
+    h += "<select class='sel' id='f-model' aria-label='Modèle IA'>" + MODELS.map(function (m) {
       return "<option value='" + m.id + "'" + (state.modelId === m.id ? " selected" : "") + ">" + m.nom + " ($" + (m.rate*1000).toFixed(2) + "/1M tok)</option>";
     }).join("") + "</select>";
 
     h += "<span class='token-badge'>~" + tok.toLocaleString("fr-FR") + " tokens (" + costStr + ")</span>";
     h += "</div>";
 
+    if (s.npmScripts && s.npmScripts.length) {
+      h += "<div class='npm-launch-box'><div class='npm-title'>🚀 Commandes Lancement Scannées</div><div class='npm-btns'>" +
+        s.npmScripts.map(function (sc) {
+          return "<button class='btn' data-copy-cmd='" + esc(sc.cmd) + "'><code>" + esc(sc.cmd) + "</code></button>";
+        }).join("") +
+      "</div></div>";
+    }
+
     h += "<div class='block'><label class='lbl' for='f-desc'>Description / Usage</label>" +
          "<input class='field' id='f-desc' value='" + esc(s.description) + "' placeholder='A quoi sert cette spec...'></div>";
 
-    h += "<div class='block'><label class='lbl' for='f-tpl'>Mod\u00e8le de Spec (utilisez {{variable}} pour rendre dynamique)</label>" +
-         "<textarea class='field mono' id='f-tpl' rows='9' placeholder='R\u00e9digez votre prompt avec des {{variables}}...'>" + esc(s.template) + "</textarea></div>";
+    h += "<div class='block'><label class='lbl' for='f-tpl'>Modèle de Spec (utilisez {{variable}} pour rendre dynamique)</label>" +
+         "<textarea class='field mono' id='f-tpl' rows='9' placeholder='Rédigez votre prompt avec des {{variables}}...'>" + esc(s.template) + "</textarea></div>";
 
     if (vars.length > 0) {
       h += "<div class='vars-container'><div class='vars-title'><span>Formulaire Dynamique de Variables (" + vars.length + ")</span></div>" +
@@ -599,12 +656,17 @@
            }).join("") + "</div></div>";
     }
 
-    h += "<div class='block'><span class='lbl'>Aper\u00e7u Compil\u00e9 du Prompt Final</span>" +
+    h += "<div class='block'><span class='lbl'>Aperçu Compilé du Prompt Final</span>" +
          "<div class='preview-box' id='preview-box'>" + esc(compiled) + "</div></div>";
 
+    h += "<div class='ai-response-container' id='ai-response-area' hidden>" +
+         "<div class='ai-head'><span>Réponse IA (" + esc(state.apiCfg.provider) + ")</span><button class='btn btn-ghost' id='ai-copy-btn'>Copier</button></div>" +
+         "<div class='ai-text' id='ai-response-text'>...</div></div>";
+
     h += "<div class='d-foot'>" +
-      "<button class='btn btn-primary' id='btn-copy-compiled'>Copier le Prompt Compil\u00e9</button>" +
-      "<button class='btn' id='btn-export-file'>T\u00e9l\u00e9charger le Fichier (" + esc(fmt.nom) + ")</button>" +
+      "<button class='btn btn-primary' id='btn-copy-compiled'>Copier le Prompt Compilé</button>" +
+      "<button class='btn' id='btn-run-ai' style='border-color:var(--accent); color:var(--accent-ink);'>▶ Tester avec l'IA (" + esc(state.apiCfg.provider) + ")</button>" +
+      "<button class='btn' id='btn-export-file'>Télécharger (" + esc(fmt.nom) + ")</button>" +
       "<button class='btn btn-ghost btn-danger' id='btn-suppr' style='margin-left:auto'>Supprimer</button>" +
       "</div></div>";
 
@@ -655,6 +717,14 @@
       });
     });
 
+    Array.prototype.forEach.call(document.querySelectorAll("[data-copy-cmd]"), function (btn) {
+      btn.addEventListener("click", function () {
+        var cmd = btn.getAttribute("data-copy-cmd");
+        if (navigator.clipboard) navigator.clipboard.writeText(cmd);
+        toast("Commande copiée : " + cmd);
+      });
+    });
+
     var back = document.getElementById("back");
     if (back) back.addEventListener("click", function () { document.getElementById("app").classList.remove("open"); });
 
@@ -662,9 +732,13 @@
       var compiled = compileSpec(s);
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(compiled).then(function () {
-          toast("Prompt compil\u00e9 copi\u00e9 dans le presse-papier !");
+          toast("Prompt compilé copié dans le presse-papier !");
         });
       }
+    });
+
+    document.getElementById("btn-run-ai").addEventListener("click", function () {
+      executerIA(s);
     });
 
     document.getElementById("btn-export-file").addEventListener("click", function () {
@@ -681,17 +755,70 @@
       a.download = fname;
       document.body.appendChild(a); a.click();
       setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-      toast("Fichier " + fname + " t\u00e9l\u00e9charg\u00e9.");
+      toast("Fichier " + fname + " téléchargé.");
     });
 
     document.getElementById("btn-suppr").addEventListener("click", function () {
-      if (!confirm("Supprimer la spec \u00ab " + (s.nom || "Sans titre") + " \u00bb ?")) return;
+      if (!confirm("Supprimer la spec « " + (s.nom || "Sans titre") + " » ?")) return;
       state.specs = state.specs.filter(function (x) { return x.id !== s.id; });
       state.sel = null; sauver();
       document.getElementById("app").classList.remove("open");
       renderListe(); renderStats(); renderFiltres(); renderDetail();
-      toast("Spec supprim\u00e9e.");
+      toast("Spec supprimée.");
     });
+  }
+
+  function executerIA(spec) {
+    var area = document.getElementById("ai-response-area");
+    var txtEl = document.getElementById("ai-response-text");
+    if (!area || !txtEl) return;
+    area.hidden = false;
+    txtEl.textContent = "Connexion à " + state.apiCfg.provider + " (" + (state.apiCfg.model || "défaut") + ")...";
+
+    var promptCompile = compileSpec(spec);
+    var p = state.apiCfg.provider;
+
+    if (p === "ollama") {
+      fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: state.apiCfg.model || "llama3", prompt: promptCompile, stream: false })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        txtEl.textContent = data.response || "Aucune réponse reçue d'Ollama.";
+        toast("Réponse Ollama reçue !");
+      }).catch(function(err) {
+        txtEl.textContent = "Erreur de connexion à Ollama (" + err.message + "). Vérifie qu'Ollama tourne bien sur http://localhost:11434.";
+      });
+    } else if (p === "groq" || p === "openrouter") {
+      var url = p === "groq" ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + state.apiCfg.key
+        },
+        body: JSON.stringify({
+          model: state.apiCfg.model || (p === "groq" ? "llama-3.3-70b-versatile" : "deepseek/deepseek-r1:free"),
+          messages: [{ role: "user", content: promptCompile }]
+        })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.choices && data.choices[0]) {
+          txtEl.textContent = data.choices[0].message.content;
+          toast("Réponse " + p + " reçue !");
+        } else {
+          txtEl.textContent = "Erreur API : " + JSON.stringify(data);
+        }
+      }).catch(function(err) {
+        txtEl.textContent = "Erreur de requête " + p + " : " + err.message;
+      });
+    } else {
+      txtEl.textContent = "Configuration IA " + p + " prêtes. (Configure la clé API si nécessaire).";
+    }
+
+    document.getElementById("ai-copy-btn").onclick = function() {
+      if (navigator.clipboard) navigator.clipboard.writeText(txtEl.textContent);
+      toast("Réponse IA copié !");
+    };
   }
 
   function updatePreview(s) {
@@ -704,6 +831,126 @@
     var tb = document.querySelector(".token-badge");
     if (tb) tb.textContent = "~" + tok.toLocaleString("fr-FR") + " tokens (" + costStr + " - " + m.nom + ")";
   }
+
+  /* ---------- SCANNER DE DOSSIER ---------- */
+  function lireTexte(f) {
+    if (!f || f.size > 500000) return Promise.resolve("");
+    if (f.text) return f.text().then(function (t) { return t; }, function () { return ""; });
+    return new Promise(function (res) {
+      var r = new FileReader();
+      r.onload = function () { res(String(r.result)); };
+      r.onerror = function () { res(""); };
+      try { r.readAsText(f); } catch (e) { res(""); }
+    });
+  }
+
+  function analyserDossier(files) {
+    var pkgFile = null, readmeFile = null, gitConfigFile = null, folderName = "";
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      var rel = f.webkitRelativePath || f.name;
+      var parts = rel.split("/");
+      if (!folderName) folderName = parts[0];
+      var base = parts[parts.length - 1].toLowerCase();
+      if (base === "package.json" && parts.length <= 3) pkgFile = f;
+      if (base.indexOf("readme") === 0 && parts.length <= 3) readmeFile = f;
+      if (base === "config" && parts.indexOf(".git") > -1) gitConfigFile = f;
+    }
+
+    Promise.all([lireTexte(pkgFile), lireTexte(readmeFile)]).then(function(res) {
+      var pkg = null;
+      try { pkg = res[0] ? JSON.parse(res[0]) : null; } catch(e){}
+      var pName = (pkg && pkg.name) || folderName || "Projet Scanné";
+      var pDesc = (pkg && pkg.description) || "Projet local scanné le " + new Date().toLocaleDateString("fr-FR");
+      var npmCmds = [];
+      if (pkg && pkg.scripts) {
+        Object.keys(pkg.scripts).forEach(function(k) {
+          npmCmds.push({ name: k, cmd: "npm run " + k });
+        });
+      }
+
+      var tpl = "# Spec pour le projet " + pName + "\n\n## Description\n" + pDesc + "\n\n## Directives d'Agent IA\n- Développer en respectant l'architecture existante.\n- Exécuter la commande {{commande_test}} avant de valider.";
+      var s = {
+        id: uid(), nom: "Spec: " + pName, format: "claude-md",
+        description: pDesc, template: tpl, npmScripts: npmCmds,
+        values: { commande_test: npmCmds.length ? npmCmds[0].cmd : "npm test" },
+        majLe: new Date().toISOString()
+      };
+
+      state.specs.unshift(s);
+      state.sel = s.id;
+      sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
+      toast("Dossier « " + pName + " » scanné et spec créée !");
+    });
+  }
+
+  document.getElementById("btn-scan").addEventListener("click", function () {
+    document.getElementById("dir").click();
+  });
+  document.getElementById("dir").addEventListener("change", function () {
+    var fichiers = this.files ? Array.prototype.slice.call(this.files) : [];
+    this.value = "";
+    if (fichiers.length) analyserDossier(fichiers);
+  });
+
+  /* ---------- CONFIGURATION IA ---------- */
+  document.getElementById("btn-api-config").addEventListener("click", function () {
+    document.getElementById("cfg-provider").value = state.apiCfg.provider || "ollama";
+    document.getElementById("cfg-model").value = state.apiCfg.model || "llama3";
+    document.getElementById("cfg-key").value = state.apiCfg.key || "";
+    document.getElementById("modal-api").hidden = false;
+  });
+  document.getElementById("m-close-api").addEventListener("click", function () {
+    document.getElementById("modal-api").hidden = true;
+  });
+  document.getElementById("cfg-save").addEventListener("click", function () {
+    state.apiCfg.provider = document.getElementById("cfg-provider").value;
+    state.apiCfg.model = document.getElementById("cfg-model").value.trim();
+    state.apiCfg.key = document.getElementById("cfg-key").value.trim();
+    sauver();
+    document.getElementById("modal-api").hidden = true;
+    toast("Configuration IA enregistrée (" + state.apiCfg.provider + ") !");
+    if (state.sel) renderDetail();
+  });
+
+  /* ---------- GALERIE ---------- */
+  function renderGallery() {
+    var gl = document.getElementById("gallery-list"); if (!gl) return;
+    gl.innerHTML = PRESETS.map(function (p, idx) {
+      return "<div class='preset-card' data-preset-idx='" + idx + "'>" +
+        "<div class='preset-title'>" + esc(p.nom) + "</div>" +
+        "<div class='preset-desc'>" + esc(p.description) + "</div>" +
+        "<button class='btn btn-primary' style='height:28px; font-size:12px;'>Utiliser ce modèle</button>" +
+      "</div>";
+    }).join("");
+  }
+  document.getElementById("btn-gallery").addEventListener("click", function () {
+    renderGallery(); document.getElementById("modal-gallery").hidden = false;
+  });
+  document.getElementById("m-close-gallery").addEventListener("click", function () {
+    document.getElementById("modal-gallery").hidden = true;
+  });
+  document.getElementById("modal-gallery").addEventListener("click", function (e) {
+    if (e.target === this) document.getElementById("modal-gallery").hidden = true;
+    var card = e.target.closest("[data-preset-idx]");
+    if (card) {
+      var idx = +card.getAttribute("data-preset-idx");
+      var p = PRESETS[idx];
+      if (p) {
+        var s = {
+          id: uid(), nom: p.nom, format: p.format, description: p.description,
+          template: p.template, values: JSON.parse(JSON.stringify(p.values || {})), majLe: new Date().toISOString()
+        };
+        state.specs.unshift(s);
+        state.sel = s.id; state.filtreFmt = "tous"; state.q = "";
+        document.getElementById("q").value = "";
+        document.getElementById("modal-gallery").hidden = true;
+        document.getElementById("app").classList.add("open");
+        sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
+        toast("Modèle « " + p.nom + " » ajouté !");
+      }
+    }
+  });
 
   document.getElementById("filters").addEventListener("click", function (e) {
     var b = e.target.closest("[data-fmt]"); if (!b) return;
@@ -736,48 +983,6 @@
     var n = document.getElementById("f-nom"); if (n) n.focus();
   });
 
-  function renderGallery() {
-    var gl = document.getElementById("gallery-list"); if (!gl) return;
-    gl.innerHTML = PRESETS.map(function (p, idx) {
-      return "<div class='preset-card' data-preset-idx='" + idx + "'>" +
-        "<div class='preset-title'>" + esc(p.nom) + "</div>" +
-        "<div class='preset-desc'>" + esc(p.description) + "</div>" +
-        "<button class='btn btn-primary' style='height:28px; font-size:12px;'>Utiliser ce modèle</button>" +
-      "</div>";
-    }).join("");
-  }
-
-  document.getElementById("btn-gallery").addEventListener("click", function () {
-    renderGallery();
-    document.getElementById("modal-gallery").hidden = false;
-  });
-
-  document.getElementById("m-close").addEventListener("click", function () {
-    document.getElementById("modal-gallery").hidden = true;
-  });
-
-  document.getElementById("modal-gallery").addEventListener("click", function (e) {
-    if (e.target === this) document.getElementById("modal-gallery").hidden = true;
-    var card = e.target.closest("[data-preset-idx]");
-    if (card) {
-      var idx = +card.getAttribute("data-preset-idx");
-      var p = PRESETS[idx];
-      if (p) {
-        var s = {
-          id: uid(), nom: p.nom, format: p.format, description: p.description,
-          template: p.template, values: JSON.parse(JSON.stringify(p.values || {})), majLe: new Date().toISOString()
-        };
-        state.specs.unshift(s);
-        state.sel = s.id; state.filtreFmt = "tous"; state.q = "";
-        document.getElementById("q").value = "";
-        document.getElementById("modal-gallery").hidden = true;
-        document.getElementById("app").classList.add("open");
-        sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-        toast("Modèle « " + p.nom + " » ajouté !");
-      }
-    }
-  });
-
   document.getElementById("btn-export").addEventListener("click", function () {
     var data = JSON.stringify({ v: 1, specs: state.specs }, null, 2);
     var blob = new Blob([data], { type: "application/json" });
@@ -786,7 +991,7 @@
     a.download = "promptforge-specs.json";
     document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-    toast("Sauvegarde JSON t\u00e9l\u00e9charg\u00e9e.");
+    toast("Sauvegarde JSON téléchargée.");
   });
 
   document.getElementById("btn-import").addEventListener("click", function () { document.getElementById("file").click(); });
@@ -800,7 +1005,7 @@
         if (d && Array.isArray(d.specs)) {
           state.specs = d.specs;
           sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-          toast("Specs import\u00e9es avec succ\u00e8s.");
+          toast("Specs importées avec succès.");
         }
       } catch (e) { toast("Fichier JSON invalide."); }
     };
@@ -808,7 +1013,7 @@
     this.value = "";
   });
 
-  /* ---------- D\u00e9marrage ---------- */
+  /* ---------- Démarrage ---------- */
   charger();
   renderStats(); renderFiltres(); renderListe();
   if (state.specs.length > 0) state.sel = state.specs[0].id;
