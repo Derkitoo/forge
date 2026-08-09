@@ -366,9 +366,10 @@
         <label class="lbl" for="cfg-provider">Fournisseur d'IA / API</label>
         <select class="sel" id="cfg-provider" style="width:100%">
           <option value="ollama">🦙 Ollama Local (http://localhost:11434) — 100% Gratuit & Hors-ligne</option>
-          <option value="groq">⚡ Groq Free API (https://api.groq.com/openai/v1) — Ultra Rapide</option>
-          <option value="openrouter">🌐 OpenRouter Free Tier (DeepSeek / Llama 3)</option>
-          <option value="gemini">🌟 Google Gemini API Key (Free Tier)</option>
+          <option value="gemini">🌟 Google Gemini API (gemini-2.0-flash)</option>
+          <option value="mistral">🇫🇷 Mistral AI (mistral-small-latest)</option>
+          <option value="groq">⚡ Groq Free API (llama-3.3-70b-versatile)</option>
+          <option value="openrouter">🌐 OpenRouter Free Tier (deepseek-r1:free)</option>
         </select>
       </div>
       <div class="block">
@@ -821,6 +822,34 @@
       }).catch(function(err) {
         txtEl.textContent = "Erreur de connexion à Ollama (" + err.message + "). Vérifie qu'Ollama tourne bien sur http://localhost:11434.";
       });
+    } else if (p.indexOf("mistral") !== -1) {
+      if (!key) {
+        txtEl.textContent = "⚠️ Veuillez d'abord ajouter votre clé API Mistral dans '🤖 Configuration IA'.";
+        return;
+      }
+      var mistralModel = model || "mistral-small-latest";
+      fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key
+        },
+        body: JSON.stringify({
+          model: mistralModel,
+          messages: [{ role: "user", content: promptCompile }]
+        })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+          txtEl.textContent = data.choices[0].message.content;
+          toast("Réponse Mistral reçue !");
+        } else if (data.error || data.message) {
+          txtEl.textContent = "❌ Erreur Mistral API : " + (data.message || JSON.stringify(data));
+        } else {
+          txtEl.textContent = "Réponse Mistral : " + JSON.stringify(data);
+        }
+      }).catch(function(err) {
+        txtEl.textContent = "❌ Erreur de réseau vers Mistral : " + err.message;
+      });
     } else if (p.indexOf("groq") !== -1 || p.indexOf("openrouter") !== -1) {
       var url = p.indexOf("groq") !== -1 ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
       fetch(url, {
@@ -926,9 +955,25 @@
   });
 
   /* ---------- CONFIGURATION IA ---------- */
+  var DEFAULT_MODELS = {
+    ollama: "llama3",
+    gemini: "gemini-2.0-flash",
+    mistral: "mistral-small-latest",
+    groq: "llama-3.3-70b-versatile",
+    openrouter: "deepseek/deepseek-r1:free"
+  };
+
+  document.getElementById("cfg-provider").addEventListener("change", function () {
+    var p = this.value;
+    if (DEFAULT_MODELS[p]) {
+      document.getElementById("cfg-model").value = DEFAULT_MODELS[p];
+    }
+  });
+
   document.getElementById("btn-api-config").addEventListener("click", function () {
-    document.getElementById("cfg-provider").value = state.apiCfg.provider || "ollama";
-    document.getElementById("cfg-model").value = state.apiCfg.model || "llama3";
+    var prov = state.apiCfg.provider || "ollama";
+    document.getElementById("cfg-provider").value = prov;
+    document.getElementById("cfg-model").value = state.apiCfg.model || DEFAULT_MODELS[prov] || "llama3";
     document.getElementById("cfg-key").value = state.apiCfg.key || "";
     document.getElementById("modal-api").hidden = false;
   });
