@@ -100,7 +100,7 @@
     transition: border-color .15s, box-shadow .15s;
   }
   .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
-  .search input { border: 0; background: none; width: 150px; font-size: 13px; }
+  .search input { border: 0; background: none; width: 140px; font-size: 13px; }
   .search input:focus { outline: none; }
   .search svg { width: 14px; height: 14px; color: var(--muted); flex: none; }
 
@@ -225,6 +225,16 @@
   .npm-title { font-family: var(--mono); font-size: 11px; color: var(--brass); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin-bottom: 8px; }
   .npm-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
+  .term-chips-container {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+  }
+  .term-chip {
+    font-family: var(--mono); font-size: 11px; background: var(--surface-2);
+    border: 1px solid var(--line-strong); border-radius: 6px; padding: 4px 8px;
+    cursor: pointer; transition: border-color .12s, background .12s; color: var(--ink-2);
+  }
+  .term-chip:hover { border-color: var(--accent); background: var(--accent-wash); color: var(--accent-ink); }
+
   .vars-container {
     border: 1px solid var(--accent); background: var(--accent-wash);
     border-radius: var(--r); padding: 16px 18px; margin-bottom: 24px;
@@ -265,7 +275,7 @@
   /* ---------- MODALS ---------- */
   .modal-overlay { position: fixed; inset: 0; background: rgba(6,14,13,.6); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
   .modal-overlay[hidden] { display: none; }
-  .modal-card { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); width: min(720px, 100%); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-card { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); width: min(780px, 100%); max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
   .modal-head { padding: 18px 24px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
   .modal-head h2 { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 0; }
   .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
@@ -320,12 +330,13 @@
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <input id="q" type="search" placeholder="Rechercher une spec&#8230;" aria-label="Rechercher">
       </label>
+      <button class="btn btn-primary" id="btn-coach" title="Générer un brief guidé étape par étape">🧠 Coach Brief</button>
       <button class="btn" id="btn-scan" title="Scanner un dossier projet local">📁 Scanner Dossier</button>
-      <button class="btn" id="btn-api-config" title="Configurer l'IA gratuite (Ollama local / Groq / Gemini)">🤖 Configuration IA</button>
+      <button class="btn" id="btn-api-config" title="Configurer l'IA gratuite (Ollama local / Gemini / Mistral)">🤖 Configuration IA</button>
       <button class="btn" id="btn-gallery" title="Voir les modèles prêts à l'emploi">💡 Galerie</button>
       <button class="btn" id="btn-export" title="Exporter JSON">Exporter</button>
       <button class="btn" id="btn-import" title="Importer JSON">Importer</button>
-      <button class="btn btn-primary" id="btn-new">+ Nouvelle Spec</button>
+      <button class="btn" id="btn-new">+ Nouvelle Spec</button>
       <input type="file" id="file" accept="application/json,.json" hidden>
       <input type="file" id="dir" webkitdirectory directory multiple hidden>
     </div>
@@ -354,7 +365,68 @@
   </div>
 </div>
 
-<!-- Modal Configuration IA (Ollama / Groq / OpenRouter / Gemini) -->
+<!-- Modal Assistant-Coach de Brief Technique -->
+<div class="modal-overlay" id="modal-coach" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>🧠 Assistant-Coach de Brief Technique</h2>
+      <button class="btn btn-ghost" id="m-close-coach">✕ Fermer</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:12px; margin-bottom:16px;">
+        <div>
+          <label class="lbl" for="c-intent">Je veux</label>
+          <select class="sel" id="c-intent" style="width:100%">
+            <option value="display">Modifier un affichage / UI</option>
+            <option value="bug">Corriger un bug</option>
+            <option value="feature">Ajouter une fonctionnalité</option>
+            <option value="access">Gérer des accès / droits</option>
+            <option value="data">Modifier les données / BDD</option>
+            <option value="deploy">Publier une version / Déploiement</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl" for="c-area">Zone concernée</label>
+          <select class="sel" id="c-area" style="width:100%">
+            <option value="interface">Interface générale / Composants</option>
+            <option value="planning">Planning / Calendrier</option>
+            <option value="auth">Connexion et comptes</option>
+            <option value="database">Supabase / Base de données</option>
+            <option value="finance">Finance et statistiques</option>
+            <option value="deploy">GitHub et Cloudflare</option>
+            <option value="other">Autre zone</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl" for="c-depth">Niveau de précision</label>
+          <select class="sel" id="c-depth" style="width:100%">
+            <option value="complete">Brief complet (Recommandé)</option>
+            <option value="simple">Demande courte</option>
+            <option value="diagnostic">Diagnostic avant de coder</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="block">
+        <label class="lbl" for="c-idea">Décrivez votre idée avec vos mots</label>
+        <textarea class="field" id="c-idea" rows="3" placeholder="Ex: Dans la vue semaine, les cartes prennent trop de place et je veux tout voir en un coup d'œil..."></textarea>
+      </div>
+
+      <div class="block" style="display:flex; flex-wrap:wrap; gap:12px;">
+        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-existing" checked> Préserver l'existant</label>
+        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-responsive" checked> Vérifier mobile & ordi</label>
+        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-build" checked> Valider le build (`npm run build`)</label>
+        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-confirm"> Confirmer avant de coder</label>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-primary" id="c-generate">🚀 Créer la Spec dans PromptForge</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Configuration IA (Ollama / Groq / OpenRouter / Gemini / Mistral) -->
 <div class="modal-overlay" id="modal-api" hidden>
   <div class="modal-card">
     <div class="modal-head">
@@ -374,7 +446,7 @@
       </div>
       <div class="block">
         <label class="lbl" for="cfg-model">Modèle IA Sélectionné</label>
-        <input class="field" id="cfg-model" placeholder="ex: llama3, deepseek-r1, llama-3.3-70b-versatile...">
+        <input class="field" id="cfg-model" placeholder="ex: llama3, deepseek-r1, gemini-2.0-flash...">
       </div>
       <div class="block">
         <label class="lbl" for="cfg-key">Clé API (Inutile pour Ollama Local)</label>
@@ -412,7 +484,34 @@
     { id: "deepseek-r1", nom: "DeepSeek R1 / V3", rate: 0.00014, ratio: 3.8 }
   ];
 
+  var TECH_VOCABULARY = [
+    { name: "Mise en page (Layout)", text: "Revoir la mise en page sans modifier la logique métier." },
+    { name: "Responsive Mobile", text: "Le rendu doit rester fluide et parfaitement responsive sur mobile et ordinateur." },
+    { name: "Débordement (Overflow)", text: "Corriger le débordement horizontal et les éléments rognés." },
+    { name: "Régression", text: "Vérifier qu'aucune régression n'est introduite sur le code existant." },
+    { name: "Gestion d'erreurs", text: "Ajouter une gestion d'erreurs robuste avec messages utilisateurs réactifs." },
+    { name: "Cas d'usage", text: "Valider le cas d'usage principal avec les données de test." },
+    { name: "Migration BDD", text: "Créer une migration SQL réversible et propre." },
+    { name: "RLS / Sécurité", text: "Sécuriser également l'accès avec une politique RLS restrictive." },
+    { name: "Build Validation", text: "Valider la compilation sans erreurs via npm run build." }
+  ];
+
   var PRESETS = [
+    {
+      id: "preset-tech-brief",
+      nom: "🧠 Assistant Demande Technique (Brief Structuré)",
+      format: "claude-md",
+      description: "Brief complet d'intention, périmètre, contraintes et critères d'acceptation.",
+      template: "## Objectif\n{{type_intention}} dans la zone « {{zone_concernee}} ».\n\n## Description du Besoin\n{{description_besoin}}\n\n## Périmètre & Fichiers de Référence\n- Zone : {{zone_concernee}}\n- Ne modifier que les fichiers strictement nécessaires.\n\n## Contraintes & Règles\n- {{regle_existant}}\n- {{regle_responsive}}\n- {{regle_build}}\n\n## Critères d'Acceptation\n- Le résultat est directement testable et utilisable.\n- Aucune régression n'est introduite.\n- Valider la syntaxe et la compilation.",
+      values: {
+        type_intention: "Ajouter une fonctionnalité",
+        zone_concernee: "Interface générale",
+        description_besoin: "Créer une vue synthétique des cartes avec filtres réactifs.",
+        regle_existant: "Préserver l'existant hors du périmètre demandé.",
+        regle_responsive: "Vérifier le rendu sur mobile et ordinateur.",
+        regle_build: "Valider la compilation avec npm run build."
+      }
+    },
     {
       id: "preset-architect",
       nom: "💻 Master Spec Agent (CLAUDE.md / AGENTS.md)",
@@ -452,14 +551,6 @@
       description: "Rédige un post percutant avec accroche et appel à l'action.",
       template: "Rédige un post percutant pour {{reseau_social}} sur le sujet : {{sujet_post}}.\n\nStructure :\n- Une accroche captivante (hook).\n- L'histoire ou la leçon en {{nb_lignes}} lignes.\n- 3 conseils pratiques.\n- Une question d'engagement à la fin.",
       values: { reseau_social: "LinkedIn", sujet_post: "L'importance de la simplicité dans les projets web", nb_lignes: "5" }
-    },
-    {
-      id: "preset-refactor",
-      nom: "🛠️ Agent Expert Refactoring & Code Clean",
-      format: "system-prompt",
-      description: "Prompt système pour réorganiser et optimiser du code legacy.",
-      template: "Tu es un expert en refactoring et architecture propre.\n\nContexte :\nAnalyse le code source du composant {{nom_composant}}.\n\nObjectif :\n1. Simplifier la fonction {{nom_fonction}}.\n2. Éliminer la duplication de code sans modifier l'API publique.\n3. Ajouter de la gestion d'erreurs robuste.\n\nContraintes :\n- Conserver la rétrocompatibilité.\n- Ne pas ajouter de dépendances externes.",
-      values: { nom_composant: "UserProfile", nom_fonction: "renderUserData" }
     }
   ];
 
@@ -651,6 +742,12 @@
     h += "<div class='block'><label class='lbl' for='f-tpl'>Modèle de Spec (utilisez {{variable}} pour rendre dynamique)</label>" +
          "<textarea class='field mono' id='f-tpl' rows='9' placeholder='Rédigez votre prompt avec des {{variables}}...'>" + esc(s.template) + "</textarea></div>";
 
+    // Vocabulaire technique suggéré
+    h += "<div class='block'><span class='lbl'>📚 Vocabulaire Technique Suggéré (Cliquer pour ajouter)</span>" +
+         "<div class='term-chips-container'>" + TECH_VOCABULARY.map(function(tv) {
+           return "<button class='term-chip' data-add-text='" + esc(tv.text) + "' title='" + esc(tv.text) + "'>+ " + esc(tv.name) + "</button>";
+         }).join("") + "</div></div>";
+
     if (vars.length > 0) {
       h += "<div class='vars-container'><div class='vars-title'><span>Formulaire Dynamique de Variables (" + vars.length + ")</span></div>" +
            "<div class='var-grid'>" + vars.map(function (v) {
@@ -711,6 +808,18 @@
       renderListe(); renderStats();
     });
 
+    Array.prototype.forEach.call(document.querySelectorAll("[data-add-text]"), function (btn) {
+      btn.addEventListener("click", function () {
+        var txt = btn.getAttribute("data-add-text");
+        s.template = (s.template || "") + "\n- " + txt;
+        s.majLe = new Date().toISOString();
+        sauver();
+        renderDetail();
+        renderListe(); renderStats();
+        toast("Expression ajoutée au modèle !");
+      });
+    });
+
     Array.prototype.forEach.call(document.querySelectorAll("[data-var]"), function (inp) {
       inp.addEventListener("input", function () {
         var key = inp.getAttribute("data-var");
@@ -732,12 +841,12 @@
           body: JSON.stringify({ command: cmd })
         }).then(function(res) { return res.json(); }).then(function(data) {
           if (data && data.status === "started") {
-            toast("\ud83d\ude80 Terminal ancr\u00e9 lanc\u00e9 : " + cmd);
+            toast("🚀 Terminal ancré lancé : " + cmd);
           } else {
-            toast("Commande copi\u00e9e : " + cmd);
+            toast("Commande copiée : " + cmd);
           }
         }).catch(function() {
-          toast("Commande copi\u00e9e ! (Lance 'node server.js' pour l'ex\u00e9cuter en 1 clic)");
+          toast("Commande copiée ! (Lance 'node server.js' pour l'exécuter en 1 clic)");
         });
       });
     });
@@ -800,7 +909,7 @@
 
     if (p.indexOf("gemini") !== -1 || p.indexOf("google") !== -1) {
       if (!key) {
-        txtEl.textContent = "⚠️ Veuillez ouvrir '\ud83e\udd16 Configuration IA' et coller votre clé API Gemini.";
+        txtEl.textContent = "⚠️ Veuillez ouvrir '🤖 Configuration IA' et coller votre clé API Gemini.";
         return;
       }
       var geminiModel = model || "gemini-2.0-flash";
@@ -891,7 +1000,7 @@
 
     document.getElementById("ai-copy-btn").onclick = function() {
       if (navigator.clipboard) navigator.clipboard.writeText(txtEl.textContent);
-      toast("R\u00e9ponse IA copi\u00e9e !");
+      toast("Réponse IA copiée !");
     };
   }
 
@@ -906,7 +1015,7 @@
     if (tb) tb.textContent = "~" + tok.toLocaleString("fr-FR") + " tokens (" + costStr + " - " + m.nom + ")";
   }
 
-  /* ---------- SCANNER DE DOSSIER ---------- */
+  /* ---------- SCANNER INTELLIGENT DE DOSSIER ---------- */
   function lireTexte(f) {
     if (!f || f.size > 500000) return Promise.resolve("");
     if (f.text) return f.text().then(function (t) { return t; }, function () { return ""; });
@@ -918,8 +1027,20 @@
     });
   }
 
+  function classerFichier(path) {
+    var p = path.toLowerCase();
+    if (p.indexOf("planning") > -1 || p.indexOf("agenda") > -1 || p.indexOf("calendar") > -1) return "Planning";
+    if (p.indexOf("auth") > -1 || p.indexOf("login") > -1 || p.indexOf("session") > -1) return "Connexion & Auth";
+    if (p.indexOf("supabase") > -1 || p.indexOf("sql") > -1 || p.indexOf("migration") > -1) return "Base de données / BDD";
+    if (p.indexOf("finance") > -1 || p.indexOf("stat") > -1 || p.indexOf("kpi") > -1) return "Finance & Stats";
+    if (p.indexOf("component") > -1 || p.indexOf("css") > -1 || p.indexOf("ui") > -1 || p.indexOf("html") > -1) return "Interface UI";
+    return "Autres fichiers";
+  }
+
   function analyserDossier(files) {
-    var pkgFile = null, readmeFile = null, gitConfigFile = null, folderName = "";
+    var pkgFile = null, readmeFile = null, folderName = "";
+    var categories = {};
+
     for (var i = 0; i < files.length; i++) {
       var f = files[i];
       var rel = f.webkitRelativePath || f.name;
@@ -928,7 +1049,10 @@
       var base = parts[parts.length - 1].toLowerCase();
       if (base === "package.json" && parts.length <= 3) pkgFile = f;
       if (base.indexOf("readme") === 0 && parts.length <= 3) readmeFile = f;
-      if (base === "config" && parts.indexOf(".git") > -1) gitConfigFile = f;
+
+      var cat = classerFichier(rel);
+      categories[cat] = categories[cat] || [];
+      if (categories[cat].length < 6) categories[cat].push(rel);
     }
 
     Promise.all([lireTexte(pkgFile), lireTexte(readmeFile)]).then(function(res) {
@@ -943,7 +1067,11 @@
         });
       }
 
-      var tpl = "# Spec pour le projet " + pName + "\n\n## Description\n" + pDesc + "\n\n## Directives d'Agent IA\n- Développer en respectant l'architecture existante.\n- Exécuter la commande {{commande_test}} avant de valider.";
+      var fileTreeSummary = Object.keys(categories).map(function(c) {
+        return "### " + c + "\n" + categories[c].map(function(fp) { return "- " + fp; }).join("\n");
+      }).join("\n\n");
+
+      var tpl = "# Spec pour le projet " + pName + "\n\n## Description\n" + pDesc + "\n\n## Directives d'Agent IA\n- Développer en respectant l'architecture existante.\n- Exécuter la commande {{commande_test}} avant de valider.\n\n## Cartographie des Fichiers Scannées\n" + fileTreeSummary;
       var s = {
         id: uid(), nom: "Spec: " + pName, format: "claude-md",
         description: pDesc, template: tpl, npmScripts: npmCmds,
@@ -954,7 +1082,7 @@
       state.specs.unshift(s);
       state.sel = s.id;
       sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-      toast("Dossier « " + pName + " » scanné et spec créée !");
+      toast("Dossier « " + pName + " » scanné et classé !");
     });
   }
 
@@ -965,6 +1093,45 @@
     var fichiers = this.files ? Array.prototype.slice.call(this.files) : [];
     this.value = "";
     if (fichiers.length) analyserDossier(fichiers);
+  });
+
+  /* ---------- ASSISTANT-COACH ---------- */
+  document.getElementById("btn-coach").addEventListener("click", function () {
+    document.getElementById("modal-coach").hidden = false;
+  });
+  document.getElementById("m-close-coach").addEventListener("click", function () {
+    document.getElementById("modal-coach").hidden = true;
+  });
+  document.getElementById("c-generate").addEventListener("click", function () {
+    var intentEl = document.getElementById("c-intent");
+    var areaEl = document.getElementById("c-area");
+    var depthEl = document.getElementById("c-depth");
+    var ideaText = document.getElementById("c-idea").value.trim() || "Demande d'évolution technique";
+
+    var intentText = intentEl.options[intentEl.selectedIndex].text;
+    var areaText = areaEl.options[areaEl.selectedIndex].text;
+
+    var s = {
+      id: uid(),
+      nom: "Brief: " + intentText + " (" + areaText.split("/")[0].trim() + ")",
+      format: "claude-md",
+      description: "Brief guidé généré le " + new Date().toLocaleDateString("fr-FR"),
+      template: "## Objectif\n" + intentText + " dans la zone « " + areaText + " ».\n\n## Description du Besoin\n" + ideaText + "\n\n## Contraintes à Respecter\n" +
+        (document.getElementById("c-existing").checked ? "- Préserver le comportement existant hors périmètre.\n" : "") +
+        (document.getElementById("c-responsive").checked ? "- Vérifier le rendu sur mobile et ordinateur.\n" : "") +
+        (document.getElementById("c-build").checked ? "- Valider la compilation via npm run build.\n" : "") +
+        (document.getElementById("c-confirm").checked ? "- Attendre ma confirmation avant de coder.\n" : "") +
+        "\n## Critères d'Acceptation\n- Le résultat demandé est visible et fonctionnel.\n- Aucune régression n'est introduite.",
+      values: {},
+      majLe: new Date().toISOString()
+    };
+
+    state.specs.unshift(s);
+    state.sel = s.id;
+    document.getElementById("modal-coach").hidden = true;
+    document.getElementById("c-idea").value = "";
+    sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
+    toast("Nouveau brief guidé généré !");
   });
 
   /* ---------- CONFIGURATION IA ---------- */
