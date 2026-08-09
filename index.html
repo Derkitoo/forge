@@ -319,7 +319,7 @@
   var KEY_API = "promptforge.api_config.v1";
 
   var DEFAULT_MODELS = {
-    gemini: "gemini-2.0-flash",
+    gemini: "gemini-1.5-flash",
     mistral: "mistral-small-latest",
     ollama: "llama3",
     groq: "llama-3.3-70b-versatile",
@@ -564,25 +564,35 @@
     var promptCompile = compileSpec(spec);
 
     if (p.indexOf("gemini") !== -1 || p.indexOf("google") !== -1) {
-      var geminiModel = model || "gemini-2.0-flash";
+      var geminiModel = model || "gemini-1.5-flash";
       var geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent?key=" + encodeURIComponent(key);
 
-      fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: promptCompile }] }] })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-          txtEl.textContent = data.candidates[0].content.parts.map(function(pt) { return pt.text; }).join("\n");
-          toast("✨ Réponse Gemini reçue !");
-        } else if (data.error) {
-          txtEl.textContent = "❌ Erreur Gemini : " + data.error.message;
-        } else {
-          txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
-        }
-      }).catch(function(err) {
-        txtEl.textContent = "❌ Erreur de réseau vers Gemini : " + err.message;
-      });
+      var tenterRequeteGemini = function(targetModel) {
+        var url = "https://generativelanguage.googleapis.com/v1beta/models/" + targetModel + ":generateContent?key=" + encodeURIComponent(key);
+        fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: promptCompile }] }] })
+        }).then(function(res) { return res.json(); }).then(function(data) {
+          if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+            txtEl.textContent = data.candidates[0].content.parts.map(function(pt) { return pt.text; }).join("\n");
+            toast("✨ Réponse Gemini (" + targetModel + ") reçue !");
+          } else if (data.error) {
+            if ((data.error.message || "").indexOf("limit: 0") !== -1 && targetModel !== "gemini-1.5-flash") {
+              txtEl.textContent = "🔄 Le modèle " + targetModel + " est restreint. Bascule automatique sur gemini-1.5-flash...";
+              tenterRequeteGemini("gemini-1.5-flash");
+            } else {
+              txtEl.textContent = "❌ Erreur Gemini (" + targetModel + ") : " + data.error.message + "\n\nAstuce : essayez de changer le modèle pour 'gemini-1.5-flash' dans ⚙️ Clés IA.";
+            }
+          } else {
+            txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
+          }
+        }).catch(function(err) {
+          txtEl.textContent = "❌ Erreur de réseau vers Gemini : " + err.message;
+        });
+      };
+
+      tenterRequeteGemini(geminiModel);
     } else if (p.indexOf("mistral") !== -1) {
       var mistralModel = model || "mistral-small-latest";
       fetch("https://api.mistral.ai/v1/chat/completions", {
