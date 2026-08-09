@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>PromptForge &#8212; Studio & Générateur IA Responsive</title>
+<title>PromptForge &#8212; Studio &amp; Générateur IA Responsive</title>
 <link rel="manifest" href="./manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,7 +80,7 @@
 
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
-  /* ---------- Topbar Dynamic & Glassmorphic ---------- */
+  /* ---------- Topbar Dynamic ---------- */
   .topbar {
     display: flex; align-items: center; justify-content: space-between; gap: 14px;
     padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--line);
@@ -90,8 +90,8 @@
   .brand h1 { font-family: var(--display); font-size: 24px; font-weight: 600; margin: 0; color: var(--ink); letter-spacing: -.02em; }
   .brand .tag { font-family: var(--mono); font-size: 10.5px; background: var(--accent-wash); color: var(--accent); padding: 3px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
 
-  .top-btns { display: flex; gap: 8px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
-  .top-btns::-webkit-scrollbar { display: none; }
+  .desktop-btns { display: flex; gap: 8px; align-items: center; }
+  .mobile-menu-btn { display: none; }
 
   .btn {
     height: 38px; padding: 0 14px; border-radius: var(--r); cursor: pointer;
@@ -139,7 +139,7 @@
   .detail { overflow-y: auto; background: var(--surface); min-height: 0; flex: 1; scroll-behavior: smooth; }
   .detail-inner { max-width: 800px; padding: 32px 36px 90px; margin: 0 auto; }
 
-  .mobile-nav-bar { display: none; margin-bottom: 16px; }
+  .mobile-back-bar { display: none; margin-bottom: 16px; }
 
   /* Accueil simple */
   .welcome-box { text-align: center; max-width: 720px; margin: 20px auto 40px; padding: 10px; }
@@ -222,21 +222,35 @@
   .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .modal-head h3 { font-family: var(--display); font-size: 24px; margin: 0; font-weight: 600; }
 
-  /* ---------- Adaptabilité Mobile / Tablette (< 880px) ---------- */
-  @media (max-width: 880px) {
-    .topbar { padding: 10px 16px; }
+  /* Menu Drawer Mobile Style */
+  .m-menu-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .m-menu-item {
+    display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+    background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--r);
+    cursor: pointer; text-align: left; transition: all .15s; font-size: 15px; font-weight: 600; color: var(--ink);
+  }
+  .m-menu-item:hover { border-color: var(--accent); background: var(--accent-wash); }
+  .m-menu-icon { font-size: 24px; flex-shrink: 0; }
+
+  /* ---------- Responsive Breakpoint (< 768px) ---------- */
+  @media (max-width: 768px) {
+    .topbar { padding: 12px 16px; }
     .brand h1 { font-size: 20px; }
     .brand .tag { display: none; }
+
+    .desktop-btns { display: none; }
+    .mobile-menu-btn { display: flex; gap: 8px; align-items: center; }
+
     .panes { grid-template-columns: 1fr; }
     .detail { display: none; }
     .app.open .listpane { display: none; }
     .app.open .detail { display: block; }
 
-    .mobile-nav-bar { display: block; }
+    .mobile-back-bar { display: block; }
     .detail-inner { padding: 20px 16px 80px; }
 
     .steps-grid, .quick-cards, .wf-grid { grid-template-columns: 1fr; }
-    .btn { height: 42px; padding: 0 16px; }
+    .btn { height: 44px; padding: 0 16px; font-size: 14px; }
     .q-card { padding: 16px; }
 
     .modal-overlay { padding: 0; }
@@ -250,9 +264,11 @@
     <div class="brand" id="go-home">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"><path d="M2 12h20M7 12V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
       <h1>PromptForge</h1>
-      <span class="tag">Responsive</span>
+      <span class="tag">Mobile UX</span>
     </div>
-    <div class="top-btns">
+
+    <!-- Desktop Menu Bar -->
+    <div class="desktop-btns">
       <button class="btn btn-primary" id="btn-coach">🧠 Demande guidée</button>
       <button class="btn" id="btn-skills">📦 Skills Pro</button>
       <button class="btn" id="btn-wireframe">🎨 Wireframe</button>
@@ -260,6 +276,12 @@
       <button class="btn" id="btn-scan">📁 Scanner</button>
       <button class="btn" id="btn-theme" title="Changer le thème">🌙 Thème</button>
       <button class="btn" id="btn-open-api" title="Configurer l'IA">⚙️ Clés</button>
+    </div>
+
+    <!-- Mobile Header Actions (Clean 2-button UI) -->
+    <div class="mobile-menu-btn">
+      <button class="btn" id="btn-theme-mob" title="Thème">🌙</button>
+      <button class="btn btn-primary" id="btn-mobile-menu">☰ Menu</button>
     </div>
   </header>
 
@@ -279,6 +301,42 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Modal Mobile Menu Drawer -->
+<div class="modal-overlay" id="modal-mobile-menu" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>📱 Menu PromptForge</h3>
+      <button class="btn btn-ghost" id="m-close-mob-menu">✕</button>
+    </div>
+    <div class="m-menu-grid">
+      <button class="m-menu-item" id="mob-act-coach">
+        <span class="m-menu-icon">🧠</span>
+        <div><div>Créer une Demande Guidée</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Répondre à 2 questions simples</div></div>
+      </button>
+      <button class="m-menu-item" id="mob-act-skills">
+        <span class="m-menu-icon">📦</span>
+        <div><div>Mes Skills Pro & Import</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Empiler des compétences d'experts</div></div>
+      </button>
+      <button class="m-menu-item" id="mob-act-wireframe">
+        <span class="m-menu-icon">🎨</span>
+        <div><div>Studio Visuel Wireframe</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Générer une maquette UI Web</div></div>
+      </button>
+      <button class="m-menu-item" id="mob-act-gallery">
+        <span class="m-menu-icon">💡</span>
+        <div><div>Modèles Prêts à l'Emploi</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Email, correction, résumé...</div></div>
+      </button>
+      <button class="m-menu-item" id="mob-act-scan">
+        <span class="m-menu-icon">📁</span>
+        <div><div>Scanner un Dossier Projet</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Analyser un dossier local</div></div>
+      </button>
+      <button class="m-menu-item" id="mob-act-api">
+        <span class="m-menu-icon">⚙️</span>
+        <div><div>Configuration IA & Clés API</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Gemini, Mistral, Ollama...</div></div>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal Gestionnaire & Importateur de Skills Pro -->
 <div class="modal-overlay" id="modal-skills" hidden>
@@ -518,17 +576,32 @@
     setTimeout(function () { el.classList.remove("on"); }, 2800);
   }
 
-  function initTheme() {
-    var savedTheme = localStorage.getItem(KEY_THEME) || "dark";
-    document.documentElement.setAttribute("data-theme", savedTheme);
-  }
-  document.getElementById("btn-theme").addEventListener("click", function () {
+  function toggleTheme() {
     var cur = document.documentElement.getAttribute("data-theme") || "dark";
     var next = cur === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem(KEY_THEME, next);
     toast("Thème " + (next === "dark" ? "sombre" : "clair") + " activé !");
-  });
+  }
+
+  function initTheme() {
+    var savedTheme = localStorage.getItem(KEY_THEME) || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }
+  document.getElementById("btn-theme").addEventListener("click", toggleTheme);
+  document.getElementById("btn-theme-mob").addEventListener("click", toggleTheme);
+
+  /* Mobile Drawer Menu Listeners */
+  var mobMenu = document.getElementById("modal-mobile-menu");
+  document.getElementById("btn-mobile-menu").addEventListener("click", function() { mobMenu.hidden = false; });
+  document.getElementById("m-close-mob-menu").addEventListener("click", function() { mobMenu.hidden = true; });
+
+  document.getElementById("mob-act-coach").addEventListener("click", function() { mobMenu.hidden = true; document.getElementById("modal-coach").hidden = false; });
+  document.getElementById("mob-act-skills").addEventListener("click", function() { mobMenu.hidden = true; renderSkillsList(); document.getElementById("modal-skills").hidden = false; });
+  document.getElementById("mob-act-wireframe").addEventListener("click", function() { mobMenu.hidden = true; renderWfCanvas(); document.getElementById("modal-wireframe").hidden = false; });
+  document.getElementById("mob-act-gallery").addEventListener("click", function() { mobMenu.hidden = true; renderGallery(); document.getElementById("modal-gallery").hidden = false; });
+  document.getElementById("mob-act-scan").addEventListener("click", function() { mobMenu.hidden = true; document.getElementById("dir").click(); });
+  document.getElementById("mob-act-api").addEventListener("click", function() { mobMenu.hidden = true; document.getElementById("modal-api").hidden = false; });
 
   function charger() {
     try {
@@ -655,8 +728,8 @@
     var allSk = getAllSkills();
 
     var h = "<div class='detail-inner'>";
-    h += "<div class='mobile-nav-bar'>" +
-           "<button class='btn btn-primary' id='back' style='width:100%; height:42px; justify-content:center;'>← Retour aux modèles</button>" +
+    h += "<div class='mobile-back-bar'>" +
+           "<button class='btn btn-primary' id='back' style='width:100%; height:44px; justify-content:center; font-weight:600;'>← Retour aux modèles</button>" +
          "</div>";
 
     h += "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;'>" +
@@ -1029,7 +1102,7 @@
     toast("✨ Nouvelle demande créée !");
   });
 
-  document.getElementById("btn-gallery").addEventListener("click", function () {
+  function renderGallery() {
     var gl = document.getElementById("gallery-list");
     gl.innerHTML = PRESETS.map(function (p, i) {
       return "<div class='q-card' data-gallery-idx='" + i + "'>" +
@@ -1037,6 +1110,10 @@
         "<div><div class='q-name'>" + esc(p.nom) + "</div><div class='q-sub'>" + esc(p.desc) + "</div></div>" +
       "</div>";
     }).join("");
+  }
+
+  document.getElementById("btn-gallery").addEventListener("click", function () {
+    renderGallery();
     document.getElementById("modal-gallery").hidden = false;
   });
 
