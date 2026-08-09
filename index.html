@@ -296,35 +296,45 @@
     { id: "json-spec", nom: "JSON Spec", ext: ".json", color: "#3E7431" }
   ];
 
+  var MODELS = [
+    { id: "claude-3-7-sonnet", nom: "Claude 3.7 / 3.5 Sonnet", rate: 0.0030, ratio: 3.7 },
+    { id: "claude-3-5-haiku", nom: "Claude 3.5 Haiku", rate: 0.0008, ratio: 3.8 },
+    { id: "gpt-4o", nom: "GPT-4o", rate: 0.0025, ratio: 3.7 },
+    { id: "gpt-4o-mini", nom: "GPT-4o-mini", rate: 0.00015, ratio: 3.8 },
+    { id: "gemini-2-flash", nom: "Gemini 2.0 Flash", rate: 0.00010, ratio: 4.0 },
+    { id: "gemini-1-5-pro", nom: "Gemini 1.5 Pro", rate: 0.00125, ratio: 3.9 },
+    { id: "deepseek-r1", nom: "DeepSeek R1 / V3", rate: 0.00014, ratio: 3.8 }
+  ];
+
   var PRESETS = [
     {
       id: "preset-architect",
       nom: "Master Spec Agent (CLAUDE.md / AGENTS.md)",
       format: "claude-md",
-      description: "Spécification d'architecture et consignes de code pour les agents IA.",
-      template: "# Projet {{nom_projet}}\n\n## Vision & Objectif\n{{objectif_projet}}\n\n## Stack Technique\n- Langage & Framework : {{stack_technique}}\n- Style CSS : {{style_css}}\n\n## Directives Strictes pour l'Agent IA\n- Toujours respecter la structure du codebase existant.\n- Vérifier les lints et la syntaxe avant d'achever une tâche.\n- Ne jamais supprimer de code ou d'assertions sans autorisation.\n\n## Commandes de Vérification\n```bash\n{{commande_test}}\n```",
-      values: { nom_projet: "MonProjet", objectif_projet: "Créer une webapp ultra rapide et élégante", stack_technique: "HTML5, Vanilla JS", style_css: "Vanilla CSS Tokens", commande_test: "npm test" }
+      description: "Sp\u00e9cification d'architecture et consignes de code pour les agents IA.",
+      template: "# Projet {{nom_projet}}\n\n## Vision & Objectif\n{{objectif_projet}}\n\n## Stack Technique\n- Langage & Framework : {{stack_technique}}\n- Style CSS : {{style_css}}\n\n## Directives Strictes pour l'Agent IA\n- Toujours respecter la structure du codebase existant.\n- V\u00e9rifier les lints et la syntaxe avant d'achever une t\u00e2che.\n- Ne jamais supprimer de code ou d'assertions sans autorisation.\n\n## Commandes de V\u00e9rification\n```bash\n{{commande_test}}\n```",
+      values: { nom_projet: "MonProjet", objectif_projet: "Cr\u00e9er une webapp ultra rapide et \u00e9l\u00e9gante", stack_technique: "HTML5, Vanilla JS", style_css: "Vanilla CSS Tokens", commande_test: "npm test" }
     },
     {
       id: "preset-refactor",
       nom: "Agent Expert Refactoring & Code Clean",
       format: "system-prompt",
-      description: "Prompt système pour réorganiser et optimiser du code legacy.",
-      template: "Tu es un expert en refactoring et architecture propre.\n\nContexte :\nAnalyse le code source du composant {{nom_composant}}.\n\nObjectif :\n1. Simplifier la fonction {{nom_fonction}}.\n2. Éliminer la duplication de code sans modifier l'API publique.\n3. Ajouter de la gestion d'erreurs robuste.\n\nContraintes :\n- Conserver la rétrocompatibilité.\n- Ne pas ajouter de dépendances externes.",
+      description: "Prompt syst\u00e8me pour r\u00e9organiser et optimiser du code legacy.",
+      template: "Tu es un expert en refactoring et architecture propre.\n\nContexte :\nAnalyse le code source du composant {{nom_composant}}.\n\nObjectif :\n1. Simplifier la fonction {{nom_fonction}}.\n2. \u00c9liminer la duplication de code sans modifier l'API publique.\n3. Ajouter de la gestion d'erreurs robuste.\n\nContraintes :\n- Conserver la r\u00e9trocompatibilit\u00e9.\n- Ne pas ajouter de d\u00e9pendances externes.",
       values: { nom_composant: "UserProfile", nom_fonction: "renderUserData" }
     },
     {
       id: "preset-ui-design",
       nom: "Agent Design System & UI Craft",
       format: "system-prompt",
-      description: "Prompt pour la création d'interfaces au style Éditorial Minimaliste.",
-      template: "Crée un composant UI {{type_composant}} en respectant le design system Éditorial Minimaliste.\n\nContraintes d'Aesthetique :\n- Titres en Serif (`Iowan Old Style`, Georgia).\n- Métadonnées et badges en Monospace (`SF Mono`, uppercase).\n- Couleurs terreuses : Fond `#EDF0EF`, Texte `#0E1A19`, Accent Émeraude `#0C6B63`.\n- Support automatique du dark mode via `prefers-color-scheme`.",
+      description: "Prompt pour la cr\u00e9ation d'interfaces au style \u00c9ditorial Minimaliste.",
+      template: "Cr\u00e9e un composant UI {{type_composant}} en respectant le design system \u00c9ditorial Minimaliste.\n\nContraintes d'Aesthetique :\n- Titres en Serif (`Iowan Old Style`, Georgia).\n- M\u00e9tadonn\u00e9es et badges en Monospace (`SF Mono`, uppercase).\n- Couleurs terreuses : Fond `#EDF0EF`, Texte `#0E1A19`, Accent \u00c9meraude `#0C6B63`.\n- Support automatique du dark mode via `prefers-color-scheme`.",
       values: { type_composant: "Carte de Statistiques" }
     }
   ];
 
   var state = {
-    specs: [], sel: null, filtreFmt: "tous", q: ""
+    specs: [], sel: null, filtreFmt: "tous", q: "", modelId: "claude-3-7-sonnet"
   };
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
@@ -334,6 +344,7 @@
     });
   }
   function getFmt(id) { for (var i = 0; i < FORMATS.length; i++) if (FORMATS[i].id === id) return FORMATS[i]; return FORMATS[0]; }
+  function getModel(id) { for (var i = 0; i < MODELS.length; i++) if (MODELS[i].id === id) return MODELS[i]; return MODELS[0]; }
   function getSpec(id) { for (var i = 0; i < state.specs.length; i++) if (state.specs[i].id === id) return state.specs[i]; return null; }
 
   var toastT;
@@ -354,7 +365,7 @@
         }
       }
     } catch (e) {}
-    // Premier démarrage : charger les presets
+    // Premier d\u00e9marrage : charger les presets
     state.specs = PRESETS.map(function (p) {
       return {
         id: p.id, nom: p.nom, format: p.format, description: p.description,
@@ -385,10 +396,17 @@
     });
   }
 
-  function countTokens(str) {
+  function countTokens(str, modelId) {
     if (!str) return 0;
-    // Estimation empirique (~4 caractères = 1 token en anglais/français/code)
-    return Math.ceil(str.length / 3.8);
+    var m = getModel(modelId || state.modelId);
+    return Math.ceil(str.length / m.ratio);
+  }
+
+  function calcCost(tokens, modelId) {
+    var m = getModel(modelId || state.modelId);
+    var cost = (tokens / 1000) * m.rate;
+    if (cost < 0.0001 && cost > 0) return "<$0.0001";
+    return "$" + cost.toFixed(4);
   }
 
   function meFiltrees() {
@@ -456,7 +474,7 @@
     if (!s) {
       d.innerHTML = "<div class='blank'>" +
         "<h2>Studio de Specs IA</h2>" +
-        "<p>Sélectionnez un modèle de prompt à gauche ou créez-en un nouveau. PromptForge détectera automatiquement les variables <code>{{variable}}</code> pour générer des formulaires dynamiques.</p>" +
+        "<p>S\u00e9lectionnez un mod\u00e8le de prompt \u00e0 gauche ou cr\u00e9ez-en un nouveau. PromptForge d\u00e9tectera automatiquement les variables <code>{{variable}}</code> pour g\u00e9n\u00e9rer des formulaires dynamiques.</p>" +
         "</div>";
       return;
     }
@@ -464,25 +482,31 @@
     var fmt = getFmt(s.format);
     var vars = detectVars(s.template);
     var compiled = compileSpec(s);
-    var tok = countTokens(compiled);
-    var estCost = ((tok / 1000) * 0.003).toFixed(4);
+    var tok = countTokens(compiled, state.modelId);
+    var costStr = calcCost(tok, state.modelId);
+    var curModel = getModel(state.modelId);
 
     var h = "<div class='detail-inner'>";
-    h += "<div class='d-head'><button class='btn btn-ghost back' id='back'>← Liste</button></div>";
+    h += "<div class='d-head'><button class='btn btn-ghost back' id='back'>\u2190 Liste</button></div>";
     h += "<input class='name-input' id='f-nom' value='" + esc(s.nom) + "' placeholder='Nom de la spec (ex: Spec Claude Code)' aria-label='Nom'>";
 
     h += "<div class='row'>";
     h += "<select class='sel' id='f-format' aria-label='Format'>" + FORMATS.map(function (f) {
       return "<option value='" + f.id + "'" + (s.format === f.id ? " selected" : "") + ">" + f.nom + "</option>";
     }).join("") + "</select>";
-    h += "<span class='token-badge'>~" + tok + " tokens (est. $" + estCost + ")</span>";
+
+    h += "<select class='sel' id='f-model' aria-label='Mod\u00e8le IA'>" + MODELS.map(function (m) {
+      return "<option value='" + m.id + "'" + (state.modelId === m.id ? " selected" : "") + ">" + m.nom + " ($" + (m.rate*1000).toFixed(2) + "/1M tok)</option>";
+    }).join("") + "</select>";
+
+    h += "<span class='token-badge'>~" + tok.toLocaleString("fr-FR") + " tokens (" + costStr + ")</span>";
     h += "</div>";
 
     h += "<div class='block'><label class='lbl' for='f-desc'>Description / Usage</label>" +
-         "<input class='field' id='f-desc' value='" + esc(s.description) + "' placeholder='À quoi sert cette spec...'></div>";
+         "<input class='field' id='f-desc' value='" + esc(s.description) + "' placeholder='A quoi sert cette spec...'></div>";
 
-    h += "<div class='block'><label class='lbl' for='f-tpl'>Modèle de Spec (utilisez {{variable}} pour rendre dynamique)</label>" +
-         "<textarea class='field mono' id='f-tpl' rows='9' placeholder='Rédigez votre prompt avec des {{variables}}...'>" + esc(s.template) + "</textarea></div>";
+    h += "<div class='block'><label class='lbl' for='f-tpl'>Mod\u00e8le de Spec (utilisez {{variable}} pour rendre dynamique)</label>" +
+         "<textarea class='field mono' id='f-tpl' rows='9' placeholder='R\u00e9digez votre prompt avec des {{variables}}...'>" + esc(s.template) + "</textarea></div>";
 
     if (vars.length > 0) {
       h += "<div class='vars-container'><div class='vars-title'><span>Formulaire Dynamique de Variables (" + vars.length + ")</span></div>" +
@@ -493,12 +517,12 @@
            }).join("") + "</div></div>";
     }
 
-    h += "<div class='block'><span class='lbl'>Aperçu Compilé du Prompt Final</span>" +
+    h += "<div class='block'><span class='lbl'>Aper\u00e7u Compil\u00e9 du Prompt Final</span>" +
          "<div class='preview-box' id='preview-box'>" + esc(compiled) + "</div></div>";
 
     h += "<div class='d-foot'>" +
-      "<button class='btn btn-primary' id='btn-copy-compiled'>Copier le Prompt Compilé</button>" +
-      "<button class='btn' id='btn-export-file'>Télécharger le Fichier (" + esc(fmt.nom) + ")</button>" +
+      "<button class='btn btn-primary' id='btn-copy-compiled'>Copier le Prompt Compil\u00e9</button>" +
+      "<button class='btn' id='btn-export-file'>T\u00e9l\u00e9charger le Fichier (" + esc(fmt.nom) + ")</button>" +
       "<button class='btn btn-ghost btn-danger' id='btn-suppr' style='margin-left:auto'>Supprimer</button>" +
       "</div></div>";
 
@@ -514,6 +538,13 @@
     var fmt = document.getElementById("f-format");
     if (fmt) fmt.addEventListener("change", function () { s.format = this.value; s.majLe = new Date().toISOString(); sauver(); renderListe(); renderDetail(); });
 
+    var mod = document.getElementById("f-model");
+    if (mod) mod.addEventListener("change", function () {
+      state.modelId = this.value;
+      updatePreview(s);
+      renderStats();
+    });
+
     var desc = document.getElementById("f-desc");
     if (desc) desc.addEventListener("input", function () { s.description = desc.value; s.majLe = new Date().toISOString(); sauver(); renderListe(); });
 
@@ -522,7 +553,7 @@
       s.template = tpl.value;
       s.majLe = new Date().toISOString();
       sauver();
-      // Si la liste des variables change, on raffraichit le détail complet, sinon juste l'aperçu
+      // Si la liste des variables change, on raffraichit le d\u00e9tail complet, sinon juste l'aper\u00e7u
       var newVars = detectVars(tpl.value);
       var oldVars = Object.keys(s.values || {});
       if (newVars.join(",") !== oldVars.join(",")) {
@@ -550,7 +581,7 @@
       var compiled = compileSpec(s);
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(compiled).then(function () {
-          toast("Prompt compilé copié dans le presse-papier !");
+          toast("Prompt compil\u00e9 copi\u00e9 dans le presse-papier !");
         });
       }
     });
@@ -569,16 +600,16 @@
       a.download = fname;
       document.body.appendChild(a); a.click();
       setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-      toast("Fichier " + fname + " téléchargé.");
+      toast("Fichier " + fname + " t\u00e9l\u00e9charg\u00e9.");
     });
 
     document.getElementById("btn-suppr").addEventListener("click", function () {
-      if (!confirm("Supprimer la spec « " + (s.nom || "Sans titre") + " » ?")) return;
+      if (!confirm("Supprimer la spec \u00ab " + (s.nom || "Sans titre") + " \u00bb ?")) return;
       state.specs = state.specs.filter(function (x) { return x.id !== s.id; });
       state.sel = null; sauver();
       document.getElementById("app").classList.remove("open");
       renderListe(); renderStats(); renderFiltres(); renderDetail();
-      toast("Spec supprimée.");
+      toast("Spec supprim\u00e9e.");
     });
   }
 
@@ -586,10 +617,11 @@
     var compiled = compileSpec(s);
     var pb = document.getElementById("preview-box");
     if (pb) pb.textContent = compiled;
-    var tok = countTokens(compiled);
-    var estCost = ((tok / 1000) * 0.003).toFixed(4);
+    var m = getModel(state.modelId);
+    var tok = countTokens(compiled, state.modelId);
+    var costStr = calcCost(tok, state.modelId);
     var tb = document.querySelector(".token-badge");
-    if (tb) tb.textContent = "~" + tok + " tokens (est. $" + estCost + ")";
+    if (tb) tb.textContent = "~" + tok.toLocaleString("fr-FR") + " tokens (" + costStr + " - " + m.nom + ")";
   }
 
   document.getElementById("filters").addEventListener("click", function (e) {
