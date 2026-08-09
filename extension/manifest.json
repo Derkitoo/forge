@@ -4,8 +4,11 @@
   "version": "1.0.0",
   "description": "Assistant de demandes et specs IA directement dans votre panneau latéral Chrome",
   "permissions": ["sidePanel", "activeTab", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
-    "default_title": "Ouvrir PromptForge"
+    "default_title": "Ouvrir PromptForge Sidepanel"
   },
   "side_panel": {
     "default_path": "sidepanel.html"
