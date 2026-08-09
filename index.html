@@ -288,7 +288,7 @@
     <div class="form-group">
       <label class="lbl">Fournisseur d'IA</label>
       <select class="field" id="cfg-provider">
-        <option value="gemini">🌟 Google Gemini API (gemini-2.0-flash)</option>
+        <option value="gemini">🌟 Google Gemini API (gemini-1.5-flash)</option>
         <option value="mistral">🇫🇷 Mistral AI (mistral-small-latest)</option>
         <option value="ollama">🦙 Ollama Local (http://localhost:11434) — Gratuit & Hors-ligne</option>
         <option value="groq">⚡ Groq Free API (llama-3.3-70b-versatile)</option>
@@ -297,7 +297,7 @@
     </div>
     <div class="form-group">
       <label class="lbl">Modèle IA</label>
-      <input class="field" id="cfg-model" placeholder="ex: gemini-2.0-flash, mistral-small-latest, llama3...">
+      <input class="field" id="cfg-model" placeholder="ex: gemini-1.5-flash, mistral-small-latest, llama3...">
     </div>
     <div class="form-group">
       <label class="lbl">Clé API (Inutile pour Ollama Local)</label>
@@ -388,6 +388,14 @@
         if (cfg) state.apiCfg = cfg;
       }
     } catch (e) {}
+
+    // Auto-migration de gemini-2.0-flash (quota 0) vers gemini-1.5-flash (gratuit)
+    if (state.apiCfg && (state.apiCfg.provider === "gemini" || !state.apiCfg.provider) && state.apiCfg.model === "gemini-2.0-flash") {
+      state.apiCfg.provider = "gemini";
+      state.apiCfg.model = "gemini-1.5-flash";
+      sauver();
+    }
+
     if (!state.specs.length) {
       state.specs = PRESETS.map(function (p) {
         return { id: p.id, nom: p.nom, desc: p.desc, icon: p.icon, template: p.template, values: p.values || {} };
