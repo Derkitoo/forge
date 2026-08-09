@@ -7,6 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>PromptForge &#8212; Générateur de Demandes IA Simple</title>
+<link rel="manifest" href="./manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
@@ -30,8 +31,25 @@
     --mono: "Fira Code", monospace;
     --r: 10px;
   }
+
+  [data-theme="dark"] {
+    --ground: #0D1413;
+    --surface: #151F1E;
+    --surface-2: #1B2726;
+    --ink: #E6ECEB;
+    --ink-2: #B8C6C4;
+    --muted: #889694;
+    --line: #24302E;
+    --line-strong: #364644;
+    --accent: #4FBFAF;
+    --accent-ink: #7FD6C8;
+    --accent-wash: #173330;
+    --on-accent: #06201D;
+    --shadow: 0 6px 24px rgba(0,0,0,.4);
+  }
+
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --ground: #0D1413;
       --surface: #151F1E;
       --surface-2: #1B2726;
@@ -69,7 +87,7 @@
   .brand h1 { font-family: var(--display); font-size: 24px; font-weight: 600; margin: 0; color: var(--ink); }
   .brand .tag { font-family: var(--mono); font-size: 11px; background: var(--accent-wash); color: var(--accent); padding: 3px 8px; border-radius: 6px; font-weight: 600; }
 
-  .top-btns { display: flex; gap: 10px; align-items: center; }
+  .top-btns { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
   .btn {
     height: 38px; padding: 0 16px; border-radius: var(--r); cursor: pointer;
@@ -169,6 +187,18 @@
     white-space: pre-wrap; word-break: break-word; color: var(--ink); margin-bottom: 24px;
   }
 
+  /* Wireframe Studio CSS */
+  .wf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  .wf-item {
+    border: 1px solid var(--line-strong); background: var(--surface-2); padding: 12px;
+    border-radius: var(--r); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13.5px;
+  }
+  .wf-item.active { border-color: var(--accent); background: var(--accent-wash); font-weight: 600; color: var(--accent-ink); }
+  .wf-preview-canvas {
+    border: 2px dashed var(--line-strong); background: var(--surface-2); border-radius: var(--r);
+    padding: 16px; min-height: 140px; margin-bottom: 16px; font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+
   .toast {
     position: fixed; bottom: 28px; left: 50%; transform: translate(-50%, 20px);
     background: var(--ink); color: var(--ground); padding: 12px 24px; border-radius: 100px;
@@ -189,7 +219,7 @@
     .detail { display: none; }
     .app.open .listpane { display: none; }
     .app.open .detail { display: block; }
-    .steps-grid, .quick-cards { grid-template-columns: 1fr; }
+    .steps-grid, .quick-cards, .wf-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -199,13 +229,15 @@
     <div class="brand" id="go-home">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"><path d="M2 12h20M7 12V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
       <h1>PromptForge</h1>
-      <span class="tag">Simplicité</span>
+      <span class="tag">Studio IA</span>
     </div>
     <div class="top-btns">
-      <button class="btn btn-primary" id="btn-coach">🧠 Créer une demande guidée</button>
-      <button class="btn" id="btn-gallery">💡 Modèles prêts</button>
-      <button class="btn" id="btn-scan" title="Scanner un dossier projet">📁 Scanner dossier</button>
-      <button class="btn" id="btn-open-api" title="Configurer l'IA (Gemini / Mistral / Ollama / Groq)">⚙️ Clés IA</button>
+      <button class="btn btn-primary" id="btn-coach">🧠 Demande guidée</button>
+      <button class="btn" id="btn-wireframe">🎨 Studio Wireframe</button>
+      <button class="btn" id="btn-gallery">💡 Modèles</button>
+      <button class="btn" id="btn-scan" title="Scanner un dossier projet">📁 Scanner</button>
+      <button class="btn" id="btn-theme" title="Changer le thème">🌙 Thème</button>
+      <button class="btn" id="btn-open-api" title="Configurer l'IA">⚙️ Clés</button>
     </div>
   </header>
 
@@ -225,6 +257,35 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Modal Studio Wireframe Visuel -->
+<div class="modal-overlay" id="modal-wireframe" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>🎨 Studio Visuel Wireframe $\rightarrow$ Prompt</h3>
+      <button class="btn btn-ghost" id="m-close-wf">✕</button>
+    </div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:14px;">Sélectionnez les composants visuels à inclure dans votre maquette :</p>
+    
+    <div class="wf-grid">
+      <div class="wf-item active" data-wf="navbar">📌 En-tête Navigation (Navbar)</div>
+      <div class="wf-item active" data-wf="hero">🚀 Bandeau d'Accroche (Hero Banner)</div>
+      <div class="wf-item active" data-wf="cards">🗂️ Grille de Cartes (Card Grid)</div>
+      <div class="wf-item" data-wf="form">📝 Formulaire de Saisie (Form)</div>
+      <div class="wf-item" data-wf="table">📊 Tableau de Données (Table)</div>
+      <div class="wf-item" data-wf="footer">👣 Pied de Page (Footer)</div>
+    </div>
+
+    <label class="lbl">Aperçu Visuel de la Maquette</label>
+    <div class="wf-preview-canvas" id="wf-canvas">
+      [Header Navbar] ─── [Hero Accroche] ─── [Grille de Cartes]
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-primary" id="wf-generate">✨ Générer le Prompt Maquette UI</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal Assistant-Coach Simple -->
 <div class="modal-overlay" id="modal-coach" hidden>
@@ -317,6 +378,7 @@
 
   var KEY = "promptforge.simple.v1";
   var KEY_API = "promptforge.api_config.v1";
+  var KEY_THEME = "promptforge.theme.v1";
 
   var DEFAULT_MODELS = {
     gemini: "gemini-1.5-flash",
@@ -363,7 +425,8 @@
 
   var state = {
     specs: [], sel: null, q: "",
-    apiCfg: { provider: "gemini", model: "gemini-2.0-flash", key: "" }
+    apiCfg: { provider: "gemini", model: "gemini-1.5-flash", key: "" },
+    wf: { navbar: true, hero: true, cards: true, form: false, table: false, footer: false }
   };
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
@@ -374,6 +437,18 @@
     el.textContent = msg; el.classList.add("on");
     setTimeout(function () { el.classList.remove("on"); }, 2800);
   }
+
+  function initTheme() {
+    var savedTheme = localStorage.getItem(KEY_THEME) || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }
+  document.getElementById("btn-theme").addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme") || "dark";
+    var next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem(KEY_THEME, next);
+    toast("Thème " + (next === "dark" ? "sombre" : "clair") + " activé !");
+  });
 
   function charger() {
     try {
@@ -389,7 +464,6 @@
       }
     } catch (e) {}
 
-    // Auto-migration de gemini-2.0-flash (quota 0) vers gemini-1.5-flash (gratuit)
     if (state.apiCfg && (state.apiCfg.provider === "gemini" || !state.apiCfg.provider) && state.apiCfg.model === "gemini-2.0-flash") {
       state.apiCfg.provider = "gemini";
       state.apiCfg.model = "gemini-1.5-flash";
@@ -573,7 +647,6 @@
 
     if (p.indexOf("gemini") !== -1 || p.indexOf("google") !== -1) {
       var geminiModel = model || "gemini-1.5-flash";
-      var geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent?key=" + encodeURIComponent(key);
 
       var tenterRequeteGemini = function(targetModel) {
         var url = "https://generativelanguage.googleapis.com/v1beta/models/" + targetModel + ":generateContent?key=" + encodeURIComponent(key);
@@ -651,6 +724,58 @@
       toast("Réponse IA copiée !");
     };
   }
+
+  /* Wireframe Logic */
+  function renderWfCanvas() {
+    var c = document.getElementById("wf-canvas");
+    var active = [];
+    if (state.wf.navbar) active.push("[Header Navbar]");
+    if (state.wf.hero) active.push("[Hero Accroche]");
+    if (state.wf.cards) active.push("[Grille de Cartes]");
+    if (state.wf.form) active.push("[Formulaire]");
+    if (state.wf.table) active.push("[Tableau]");
+    if (state.wf.footer) active.push("[Footer]");
+    c.textContent = active.length ? active.join(" ─── ") : "[Sélectionnez des composants]";
+  }
+
+  document.getElementById("btn-wireframe").addEventListener("click", function () {
+    document.getElementById("modal-wireframe").hidden = false;
+    renderWfCanvas();
+  });
+  document.getElementById("m-close-wf").addEventListener("click", function () {
+    document.getElementById("modal-wireframe").hidden = true;
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-wf]"), function (item) {
+    item.addEventListener("click", function () {
+      var key = item.getAttribute("data-wf");
+      state.wf[key] = !state.wf[key];
+      if (state.wf[key]) item.classList.add("active");
+      else item.classList.remove("active");
+      renderWfCanvas();
+    });
+  });
+
+  document.getElementById("wf-generate").addEventListener("click", function () {
+    var listComp = [];
+    if (state.wf.navbar) listComp.push("Barre de navigation (Navbar) avec logo et liens");
+    if (state.wf.hero) listComp.push("Bandeau d'accroche (Hero Banner) avec titre et CTA principal");
+    if (state.wf.cards) listComp.push("Grille de cartes responsive (Card Grid)");
+    if (state.wf.form) listComp.push("Formulaire de saisie interactif (Form)");
+    if (state.wf.table) listComp.push("Tableau de données structuré (Data Table)");
+    if (state.wf.footer) listComp.push("Pied de page (Footer)");
+
+    var s = {
+      id: uid(), icon: "🎨", nom: "Maquette UI Web", desc: listComp.length + " composants visuels",
+      template: "Tu es un développeur & designer Web expert.\n\nObjectif :\nCréer l'interface web responsive intégrant la structure visuelle suivante :\n\nComposants UI requis :\n" + listComp.map(function(c){ return "- " + c; }).join("\n") + "\n\nDirectives :\n- Design moderne, propre et accessible.\n- Code HTML5 sémantique avec styles CSS modernes.\n- Interactions fluides et réactives.",
+      values: {}
+    };
+
+    state.specs.unshift(s); state.sel = s.id;
+    document.getElementById("modal-wireframe").hidden = true;
+    sauver(); renderListe(); renderDetail();
+    toast("✨ Spec Maquette UI générée !");
+  });
 
   /* Listeners Global */
   document.getElementById("list").addEventListener("click", function (e) {
@@ -735,7 +860,7 @@
   document.getElementById("btn-open-api").addEventListener("click", function () {
     var prov = state.apiCfg.provider || "gemini";
     document.getElementById("cfg-provider").value = prov;
-    document.getElementById("cfg-model").value = state.apiCfg.model || DEFAULT_MODELS[prov] || "gemini-2.0-flash";
+    document.getElementById("cfg-model").value = state.apiCfg.model || DEFAULT_MODELS[prov] || "gemini-1.5-flash";
     document.getElementById("cfg-key").value = state.apiCfg.key || "";
     document.getElementById("modal-api").hidden = false;
   });
@@ -770,7 +895,15 @@
     }
   });
 
+  /* PWA Service Worker Registration */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+
   /* Démarrage */
+  initTheme();
   charger();
   renderListe();
   renderHome();

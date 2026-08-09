@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "PromptForge Sidepanel Companion",
+  "version": "1.0.0",
+  "description": "Assistant de demandes et specs IA directement dans votre panneau latéral Chrome",
+  "permissions": ["sidePanel", "activeTab", "scripting", "storage"],
+  "action": {
+    "default_title": "Ouvrir PromptForge"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "icons": {
+    "128": "icon.png"
+  }
+}
