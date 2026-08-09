@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>PromptForge &#8212; Studio de Prompts & Specs IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -773,51 +776,21 @@
     var txtEl = document.getElementById("ai-response-text");
     if (!area || !txtEl) return;
     area.hidden = false;
-    txtEl.textContent = "Connexion à " + state.apiCfg.provider + " (" + (state.apiCfg.model || "défaut") + ")...";
 
+    var p = String(state.apiCfg.provider || "").trim().toLowerCase();
+    var key = String(state.apiCfg.key || "").trim();
+    var model = String(state.apiCfg.model || "").trim();
+
+    txtEl.textContent = "Connexion à " + (p || "l'IA") + " (" + (model || "défaut") + ")...";
     var promptCompile = compileSpec(spec);
-    var p = state.apiCfg.provider;
 
-    if (p === "ollama") {
-      fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: state.apiCfg.model || "llama3", prompt: promptCompile, stream: false })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        txtEl.textContent = data.response || "Aucune réponse reçue d'Ollama.";
-        toast("Réponse Ollama reçue !");
-      }).catch(function(err) {
-        txtEl.textContent = "Erreur de connexion à Ollama (" + err.message + "). Vérifie qu'Ollama tourne bien sur http://localhost:11434.";
-      });
-    } else if (p === "groq" || p === "openrouter") {
-      var url = p === "groq" ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + state.apiCfg.key
-        },
-        body: JSON.stringify({
-          model: state.apiCfg.model || (p === "groq" ? "llama-3.3-70b-versatile" : "deepseek/deepseek-r1:free"),
-          messages: [{ role: "user", content: promptCompile }]
-        })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        if (data.choices && data.choices[0]) {
-          txtEl.textContent = data.choices[0].message.content;
-          toast("Réponse " + p + " reçue !");
-        } else {
-          txtEl.textContent = "Erreur API : " + JSON.stringify(data);
-        }
-      }).catch(function(err) {
-        txtEl.textContent = "Erreur de requête " + p + " : " + err.message;
-      });
-    } else if (p === "gemini") {
-      if (!state.apiCfg.key) {
-        txtEl.textContent = "Veuillez d'abord ajouter votre clé API Gemini dans '🤖 Configuration IA'.";
+    if (p.indexOf("gemini") !== -1 || p.indexOf("google") !== -1) {
+      if (!key) {
+        txtEl.textContent = "⚠️ Veuillez ouvrir '\ud83e\udd16 Configuration IA' et coller votre clé API Gemini.";
         return;
       }
-      var geminiModel = state.apiCfg.model || "gemini-2.0-flash";
-      var geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent?key=" + state.apiCfg.key;
+      var geminiModel = model || "gemini-2.0-flash";
+      var geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent?key=" + encodeURIComponent(key);
 
       fetch(geminiUrl, {
         method: "POST",
@@ -830,15 +803,48 @@
           txtEl.textContent = data.candidates[0].content.parts.map(function(pt) { return pt.text; }).join("\n");
           toast("Réponse Gemini reçue !");
         } else if (data.error) {
-          txtEl.textContent = "Erreur Gemini API : " + data.error.message;
+          txtEl.textContent = "❌ Erreur Gemini API (" + (data.error.code || "") + ") : " + data.error.message;
         } else {
           txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
         }
       }).catch(function(err) {
-        txtEl.textContent = "Erreur de connexion à Gemini : " + err.message;
+        txtEl.textContent = "❌ Erreur de réseau vers Gemini : " + err.message;
+      });
+    } else if (p.indexOf("ollama") !== -1) {
+      fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: model || "llama3", prompt: promptCompile, stream: false })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        txtEl.textContent = data.response || "Aucune réponse reçue d'Ollama.";
+        toast("Réponse Ollama reçue !");
+      }).catch(function(err) {
+        txtEl.textContent = "Erreur de connexion à Ollama (" + err.message + "). Vérifie qu'Ollama tourne bien sur http://localhost:11434.";
+      });
+    } else if (p.indexOf("groq") !== -1 || p.indexOf("openrouter") !== -1) {
+      var url = p.indexOf("groq") !== -1 ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key
+        },
+        body: JSON.stringify({
+          model: model || (p.indexOf("groq") !== -1 ? "llama-3.3-70b-versatile" : "deepseek/deepseek-r1:free"),
+          messages: [{ role: "user", content: promptCompile }]
+        })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.choices && data.choices[0]) {
+          txtEl.textContent = data.choices[0].message.content;
+          toast("Réponse " + p + " reçue !");
+        } else {
+          txtEl.textContent = "Erreur API : " + JSON.stringify(data);
+        }
+      }).catch(function(err) {
+        txtEl.textContent = "Erreur de requête " + p + " : " + err.message;
       });
     } else {
-      txtEl.textContent = "Configuration IA " + p + " prête.";
+      txtEl.textContent = "Fournisseur IA (" + p + ") configuré.";
     }
 
     document.getElementById("ai-copy-btn").onclick = function() {
