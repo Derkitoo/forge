@@ -292,6 +292,7 @@
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <input id="q" type="search" placeholder="Rechercher une spec&#8230;" aria-label="Rechercher">
       </label>
+      <button class="btn" id="btn-gallery" title="Voir les modèles prêts à l'emploi">&#128161; Galerie d'Exemples</button>
       <button class="btn" id="btn-export" title="Exporter une sauvegarde de tes specs">Exporter JSON</button>
       <button class="btn" id="btn-import" title="Recharger une sauvegarde">Importer JSON</button>
       <button class="btn btn-primary" id="btn-new">+ Nouvelle Spec</button>
@@ -308,6 +309,30 @@
   </main>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Modal Galerie d'Exemples Prêts à l'emploi -->
+<style>
+  .modal-overlay { position: fixed; inset: 0; background: rgba(6,14,13,.6); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+  .modal-overlay[hidden] { display: none; }
+  .modal-card { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); width: min(720px, 100%); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-head { padding: 18px 24px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+  .modal-head h2 { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 0; }
+  .modal-body { padding: 16px 24px; overflow-y: auto; flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .preset-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px; text-align: left; cursor: pointer; transition: border-color .15s, transform .15s; }
+  .preset-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .preset-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--ink); }
+  .preset-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
+</style>
+
+<div class="modal-overlay" id="modal-gallery" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>💡 Galerie d'Exemples Prêts à l'Emploi</h2>
+      <button class="btn btn-ghost" id="m-close">✕ Fermer</button>
+    </div>
+    <div class="modal-body" id="gallery-list"></div>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -336,15 +361,47 @@
   var PRESETS = [
     {
       id: "preset-architect",
-      nom: "Master Spec Agent (CLAUDE.md / AGENTS.md)",
+      nom: "💻 Master Spec Agent (CLAUDE.md / AGENTS.md)",
       format: "claude-md",
       description: "Sp\u00e9cification d'architecture et consignes de code pour les agents IA.",
       template: "# Projet {{nom_projet}}\n\n## Vision & Objectif\n{{objectif_projet}}\n\n## Stack Technique\n- Langage & Framework : {{stack_technique}}\n- Style CSS : {{style_css}}\n\n## Directives Strictes pour l'Agent IA\n- Toujours respecter la structure du codebase existant.\n- V\u00e9rifier les lints et la syntaxe avant d'achever une t\u00e2che.\n- Ne jamais supprimer de code ou d'assertions sans autorisation.\n\n## Commandes de V\u00e9rification\n```bash\n{{commande_test}}\n```",
       values: { nom_projet: "MonProjet", objectif_projet: "Cr\u00e9er une webapp ultra rapide et \u00e9l\u00e9gante", stack_technique: "HTML5, Vanilla JS", style_css: "Vanilla CSS Tokens", commande_test: "npm test" }
     },
     {
+      id: "preset-email",
+      nom: "✉️ R\u00e9daction d'Email Professionnel",
+      format: "system-prompt",
+      description: "G\u00e9n\u00e9rateur d'emails professionnels convaincants avec ton sur-mesure.",
+      template: "R\u00e9dige un e-mail professionnel \u00e0 destination de {{destinataire}}.\n\nObjet de l'e-mail : {{sujet_email}}\n\nTon souhait\u00e9 : {{ton_souhaite}}\n\nPoints cl\u00e9s \u00e0 inclure :\n- {{point_1}}\n- {{point_2}}\n\nAppel \u00e0 l'action final : {{appel_action}}",
+      values: { destinataire: "M. le Directeur", sujet_email: "Proposition de partenariat", ton_souhaite: "professionnel et chaleureux", point_1: "Pr\u00e9sentation des r\u00e9sultats r\u00e9cents", point_2: "Proposition de rendez-vous de 15 min", appel_action: "Confirmer vos disponibilit\u00e9s pour cette semaine" }
+    },
+    {
+      id: "preset-correction",
+      nom: "✍️ Correction & R\u00e9\u00e9criture de Texte",
+      format: "system-prompt",
+      description: "Corrige les fautes d'orthographe, grammaire et am\u00e9liore la fluidit\u00e9 du style.",
+      template: "Tu es un correcteur et r\u00e9dacteur professionnel.\n\nObjectif :\nCorriger les fautes et am\u00e9liorer la fluidit\u00e9 du texte suivant.\n\nNiveau de reformulation : {{niveau_reformulation}}\n\nTexte \u00e0 corriger :\n{{texte_brut}}",
+      values: { niveau_reformulation: "r\u00e9\u00e9criture fluide et naturelle", texte_brut: "Bonjour je vous contact car je voulait savoir si vous etiez dispo..." }
+    },
+    {
+      id: "preset-resume",
+      nom: "📄 R\u00e9sum\u00e9 Synth\u00e9tique de Document",
+      format: "system-prompt",
+      description: "Extrait les id\u00e9es cl\u00e9s, d\u00e9cisions et actions d'un texte long.",
+      template: "Analyse le document suivant et fournis une synth\u00e8se structur\u00e9e.\n\nFormat de la r\u00e9ponse :\n1. R\u00e9sum\u00e9 en 3 puces principales.\n2. D\u00e9cisions cl\u00e9s identifi\u00e9es.\n3. Prochaines actions \u00e0 mener.\n\nSujet du document : {{sujet_doc}}\n\nContenu :\n{{contenu_doc}}",
+      values: { sujet_doc: "Compte-rendu de r\u00e9union produit", contenu_doc: "Collez votre texte long ici..." }
+    },
+    {
+      id: "preset-social",
+      nom: "📣 G\u00e9n\u00e9rateur de Post LinkedIn / R\u00e9seaux",
+      format: "system-prompt",
+      description: "R\u00e9dige un post percutant avec accroche et appel \u00e0 l'action.",
+      template: "R\u00e9dige un post percutant pour {{reseau_social}} sur le sujet : {{sujet_post}}.\n\nStructure :\n- Une accroche captivante (hook).\n- L'histoire ou la le\u00e7on en {{nb_lignes}} lignes.\n- 3 conseils pratiques.\n- Une question d'engagement \u00e0 la fin.",
+      values: { reseau_social: "LinkedIn", sujet_post: "L'importance de la simplicit\u00e9 dans les projets web", nb_lignes: "5" }
+    },
+    {
       id: "preset-refactor",
-      nom: "Agent Expert Refactoring & Code Clean",
+      nom: "🛠️ Agent Expert Refactoring & Code Clean",
       format: "system-prompt",
       description: "Prompt syst\u00e8me pour r\u00e9organiser et optimiser du code legacy.",
       template: "Tu es un expert en refactoring et architecture propre.\n\nContexte :\nAnalyse le code source du composant {{nom_composant}}.\n\nObjectif :\n1. Simplifier la fonction {{nom_fonction}}.\n2. \u00c9liminer la duplication de code sans modifier l'API publique.\n3. Ajouter de la gestion d'erreurs robuste.\n\nContraintes :\n- Conserver la r\u00e9trocompatibilit\u00e9.\n- Ne pas ajouter de d\u00e9pendances externes.",
@@ -352,7 +409,7 @@
     },
     {
       id: "preset-ui-design",
-      nom: "Agent Design System & UI Craft",
+      nom: "🎨 Agent Design System & UI Craft",
       format: "system-prompt",
       description: "Prompt pour la cr\u00e9ation d'interfaces au style \u00c9ditorial Minimaliste.",
       template: "Cr\u00e9e un composant UI {{type_composant}} en respectant le design system \u00c9ditorial Minimaliste.\n\nContraintes d'Aesthetique :\n- Titres en Serif (`Newsreader`, Georgia).\n- M\u00e9tadonn\u00e9es et badges en Monospace (`Fira Code`, uppercase).\n- Couleurs terreuses : Fond `#EDF0EF`, Texte `#0E1A19`, Accent \u00c9meraude `#0C6B63`.\n- Support automatique du dark mode via `prefers-color-scheme`.",
@@ -677,6 +734,48 @@
     document.getElementById("app").classList.add("open");
     sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
     var n = document.getElementById("f-nom"); if (n) n.focus();
+  });
+
+  function renderGallery() {
+    var gl = document.getElementById("gallery-list"); if (!gl) return;
+    gl.innerHTML = PRESETS.map(function (p, idx) {
+      return "<div class='preset-card' data-preset-idx='" + idx + "'>" +
+        "<div class='preset-title'>" + esc(p.nom) + "</div>" +
+        "<div class='preset-desc'>" + esc(p.description) + "</div>" +
+        "<button class='btn btn-primary' style='height:28px; font-size:12px;'>Utiliser ce modèle</button>" +
+      "</div>";
+    }).join("");
+  }
+
+  document.getElementById("btn-gallery").addEventListener("click", function () {
+    renderGallery();
+    document.getElementById("modal-gallery").hidden = false;
+  });
+
+  document.getElementById("m-close").addEventListener("click", function () {
+    document.getElementById("modal-gallery").hidden = true;
+  });
+
+  document.getElementById("modal-gallery").addEventListener("click", function (e) {
+    if (e.target === this) document.getElementById("modal-gallery").hidden = true;
+    var card = e.target.closest("[data-preset-idx]");
+    if (card) {
+      var idx = +card.getAttribute("data-preset-idx");
+      var p = PRESETS[idx];
+      if (p) {
+        var s = {
+          id: uid(), nom: p.nom, format: p.format, description: p.description,
+          template: p.template, values: JSON.parse(JSON.stringify(p.values || {})), majLe: new Date().toISOString()
+        };
+        state.specs.unshift(s);
+        state.sel = s.id; state.filtreFmt = "tous"; state.q = "";
+        document.getElementById("q").value = "";
+        document.getElementById("modal-gallery").hidden = true;
+        document.getElementById("app").classList.add("open");
+        sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
+        toast("Modèle « " + p.nom + " » ajouté !");
+      }
+    }
   });
 
   document.getElementById("btn-export").addEventListener("click", function () {
