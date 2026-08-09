@@ -811,13 +811,39 @@
       }).catch(function(err) {
         txtEl.textContent = "Erreur de requête " + p + " : " + err.message;
       });
+    } else if (p === "gemini") {
+      if (!state.apiCfg.key) {
+        txtEl.textContent = "Veuillez d'abord ajouter votre clé API Gemini dans '🤖 Configuration IA'.";
+        return;
+      }
+      var geminiModel = state.apiCfg.model || "gemini-2.0-flash";
+      var geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent?key=" + state.apiCfg.key;
+
+      fetch(geminiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptCompile }] }]
+        })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+          txtEl.textContent = data.candidates[0].content.parts.map(function(pt) { return pt.text; }).join("\n");
+          toast("Réponse Gemini reçue !");
+        } else if (data.error) {
+          txtEl.textContent = "Erreur Gemini API : " + data.error.message;
+        } else {
+          txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
+        }
+      }).catch(function(err) {
+        txtEl.textContent = "Erreur de connexion à Gemini : " + err.message;
+      });
     } else {
-      txtEl.textContent = "Configuration IA " + p + " prêtes. (Configure la clé API si nécessaire).";
+      txtEl.textContent = "Configuration IA " + p + " prête.";
     }
 
     document.getElementById("ai-copy-btn").onclick = function() {
       if (navigator.clipboard) navigator.clipboard.writeText(txtEl.textContent);
-      toast("Réponse IA copié !");
+      toast("R\u00e9ponse IA copi\u00e9e !");
     };
   }
 
