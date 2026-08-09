@@ -6,574 +6,329 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>PromptForge &#8212; Studio de Prompts & Specs IA</title>
+<title>PromptForge &#8212; Générateur de Demandes IA Simple</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ground: #EDF0EF;
+    --ground: #F4F6F5;
     --surface: #FFFFFF;
-    --surface-2: #F5F7F6;
+    --surface-2: #F9FBFB;
     --ink: #0E1A19;
     --ink-2: #3A4C4A;
     --muted: #6B7B79;
-    --line: #D7DEDC;
-    --line-strong: #BCC7C5;
+    --line: #E1E7E5;
+    --line-strong: #C4CECC;
     --accent: #0C6B63;
     --accent-ink: #085049;
-    --accent-wash: #E0EDEB;
+    --accent-wash: #E8F4F2;
     --on-accent: #FFFFFF;
-    --brass: #8A6210;
-    --brass-wash: #F3EBD9;
-    --danger: #A33124;
-    --shadow: 0 1px 3px rgba(14,26,25,.06), 0 10px 30px -10px rgba(14,26,25,.14);
-    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
-    --body: "Outfit", ui-sans-serif, -apple-system, sans-serif;
-    --mono: "Fira Code", ui-monospace, "SF Mono", monospace;
-    --r: 8px;
+    --shadow: 0 4px 20px rgba(14,26,25,.06);
+    --display: "Newsreader", Georgia, serif;
+    --body: "Outfit", ui-sans-serif, sans-serif;
+    --mono: "Fira Code", monospace;
+    --r: 10px;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --ground: #0C1312;
-      --surface: #141D1C;
-      --surface-2: #1A2523;
-      --ink: #E4EBE9;
-      --ink-2: #B4C2BF;
-      --muted: #869492;
-      --line: #26312F;
-      --line-strong: #35443F;
+      --ground: #0D1413;
+      --surface: #151F1E;
+      --surface-2: #1B2726;
+      --ink: #E6ECEB;
+      --ink-2: #B8C6C4;
+      --muted: #889694;
+      --line: #24302E;
+      --line-strong: #364644;
       --accent: #4FBFAF;
       --accent-ink: #7FD6C8;
-      --accent-wash: #16302D;
+      --accent-wash: #173330;
       --on-accent: #06201D;
-      --brass: #C79B3E;
-      --brass-wash: #2C2517;
-      --danger: #E0806F;
-      --shadow: 0 2px 8px rgba(0,0,0,.5), 0 14px 32px -12px rgba(0,0,0,.8);
+      --shadow: 0 6px 24px rgba(0,0,0,.4);
     }
   }
 
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--ground); color: var(--ink);
-    font-family: var(--body); font-size: 14.5px; line-height: 1.5;
+    font-family: var(--body); font-size: 15px; line-height: 1.5;
     -webkit-font-smoothing: antialiased; overflow: hidden;
   }
   button, input, select, textarea { font: inherit; color: inherit; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  ::placeholder { color: var(--muted); opacity: .7; }
 
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
-  /* ---------- topbar ---------- */
+  /* ---------- Header ultra épuré ---------- */
   .topbar {
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    padding: 12px 24px; background: var(--surface);
-    border-bottom: 1px solid var(--line);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 28px; background: var(--surface); border-bottom: 1px solid var(--line);
     z-index: 10;
   }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand h1 {
-    font-family: var(--display); font-size: 24px; font-weight: 600;
-    margin: 0; letter-spacing: -.02em; color: var(--ink); line-height: 1;
-  }
-  .brand .tag {
-    margin: 0; font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--accent); font-weight: 600;
-    background: var(--accent-wash); padding: 2px 7px; border-radius: 4px;
-  }
-  .anvil { width: 22px; height: 22px; flex: none; color: var(--accent); }
-  .stats {
-    display: flex; gap: 16px; flex-wrap: wrap; margin-right: auto;
-    font-family: var(--mono); font-size: 11px; letter-spacing: .04em;
-    color: var(--muted); font-variant-numeric: tabular-nums;
-  }
-  .stats b { color: var(--ink); font-weight: 600; }
-  .bar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .brand h1 { font-family: var(--display); font-size: 24px; font-weight: 600; margin: 0; color: var(--ink); }
+  .brand .tag { font-family: var(--mono); font-size: 11px; background: var(--accent-wash); color: var(--accent); padding: 3px 8px; border-radius: 6px; font-weight: 600; }
 
-  .search {
-    display: flex; align-items: center; gap: 8px;
-    border: 1px solid var(--line-strong); border-radius: var(--r);
-    background: var(--surface-2); padding: 0 10px; height: 34px;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
-  .search input { border: 0; background: none; width: 140px; font-size: 13px; }
-  .search input:focus { outline: none; }
-  .search svg { width: 14px; height: 14px; color: var(--muted); flex: none; }
+  .top-btns { display: flex; gap: 10px; align-items: center; }
 
   .btn {
-    height: 34px; padding: 0 13px; border-radius: var(--r); cursor: pointer;
+    height: 38px; padding: 0 16px; border-radius: var(--r); cursor: pointer;
     border: 1px solid var(--line-strong); background: var(--surface);
-    font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
-    transition: background .12s, border-color .12s, transform .1s; white-space: nowrap;
-    touch-action: manipulation;
+    font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;
+    transition: all .15s; white-space: nowrap; touch-action: manipulation;
   }
   .btn:hover { background: var(--surface-2); border-color: var(--muted); }
   .btn:active { transform: scale(0.98); }
   .btn-primary {
     background: var(--accent); border-color: var(--accent);
-    color: var(--on-accent); font-weight: 600; box-shadow: 0 1px 3px rgba(12,107,99,.2);
+    color: var(--on-accent); font-weight: 600; box-shadow: 0 2px 8px rgba(12,107,99,.25);
   }
   .btn-primary:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
   .btn-ghost { border-color: transparent; background: none; color: var(--muted); }
   .btn-ghost:hover { background: var(--surface-2); color: var(--ink); }
-  .btn-danger:hover { color: var(--danger); border-color: var(--danger); background: none; }
 
-  /* ---------- layout ---------- */
-  .panes { display: grid; grid-template-columns: minmax(320px, 380px) 1fr; flex: 1; min-height: 0; position: relative; }
+  /* ---------- Layout ---------- */
+  .panes { display: grid; grid-template-columns: minmax(300px, 340px) 1fr; flex: 1; min-height: 0; }
   .listpane {
     display: flex; flex-direction: column; min-height: 0;
     border-right: 1px solid var(--line); background: var(--ground);
   }
-  .filters {
-    display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
-    padding: 12px 16px; border-bottom: 1px solid var(--line);
+  .list-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
+  .search-box {
+    display: flex; align-items: center; gap: 8px; background: var(--surface);
+    border: 1px solid var(--line-strong); border-radius: var(--r); padding: 0 12px; height: 36px;
   }
-  .chip {
-    border: 1px solid var(--line-strong); background: transparent; cursor: pointer;
-    border-radius: 100px; padding: 4px 10px; font-size: 11.5px; color: var(--ink-2);
-    display: inline-flex; align-items: center; gap: 5px; font-weight: 500;
-  }
-  .chip:hover { border-color: var(--muted); }
-  .chip[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
-  .chip .n { font-family: var(--mono); font-size: 10px; opacity: .8; }
+  .search-box input { border: 0; background: none; width: 100%; font-size: 13.5px; }
+  .search-box input:focus { outline: none; }
 
-  .list { list-style: none; margin: 0; padding: 8px; overflow-y: auto; flex: 1; }
+  .list { list-style: none; margin: 0; padding: 10px; overflow-y: auto; flex: 1; }
   .card {
     width: 100%; text-align: left; cursor: pointer; display: block;
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--r); padding: 12px 14px; margin-bottom: 8px;
-    position: relative; overflow: hidden;
-    transition: border-color .12s, transform .12s, box-shadow .12s;
+    border-radius: var(--r); padding: 14px; margin-bottom: 8px;
+    transition: all .15s; position: relative;
   }
-  .card::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3.5px;
-    background: var(--fmt-color, var(--accent));
-  }
-  .card:hover { border-color: var(--line-strong); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
   .card[aria-current="true"] { border-color: var(--accent); background: var(--accent-wash); }
-  .card-top { display: flex; align-items: baseline; gap: 8px; }
-  .card-name {
-    font-family: var(--display); font-size: 16px; font-weight: 600;
-    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .card-meta { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-  .card-desc { margin-top: 6px; font-size: 12.5px; color: var(--muted); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .card-title { font-family: var(--display); font-size: 16.5px; font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+  .card-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
-  .pill {
-    font-family: var(--mono); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase;
-    padding: 2px 7px; border-radius: 4px; white-space: nowrap;
-    color: var(--fmt-color, var(--ink)); border: 1px solid currentColor; opacity: .9; font-weight: 600;
-  }
-  .tag-var {
-    font-family: var(--mono); font-size: 10px; background: var(--surface-2); color: var(--muted);
-    padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line);
-  }
-
-  /* ---------- studio detail ---------- */
+  /* ---------- Detail & Accueil ---------- */
   .detail { overflow-y: auto; background: var(--surface); min-height: 0; flex: 1; }
-  .detail-inner { max-width: 860px; padding: 28px 36px 90px; margin: 0 auto; }
-  .blank {
-    height: 100%; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 14px; text-align: center; color: var(--muted); padding: 40px 20px;
-  }
-  .blank h2 { font-family: var(--display); font-size: 24px; color: var(--ink); margin: 0; font-weight: 600; }
-  .blank p { margin: 0; max-width: 44ch; font-size: 14.5px; line-height: 1.6; }
+  .detail-inner { max-width: 760px; padding: 32px; margin: 0 auto; }
 
-  .mobile-back-bar { display: none; margin-bottom: 16px; }
-  .name-input {
-    font-family: var(--display); font-size: 28px; font-weight: 600; letter-spacing: -.02em;
-    border: 0; background: none; width: 100%; padding: 0 0 6px; margin: 0 0 6px;
-    border-bottom: 2px solid transparent; transition: border-color .15s;
+  /* Accueil simple et accueillant */
+  .welcome-box {
+    text-align: center; max-width: 680px; margin: 40px auto; padding: 20px;
   }
-  .name-input:focus { outline: none; border-bottom-color: var(--accent); }
+  .welcome-box h2 { font-family: var(--display); font-size: 32px; font-weight: 600; margin-bottom: 10px; }
+  .welcome-box p { font-size: 16px; color: var(--muted); margin-bottom: 30px; line-height: 1.6; }
 
-  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 24px; }
-  .sel {
-    height: 34px; border-radius: var(--r); border: 1px solid var(--line-strong);
-    background: var(--surface-2); padding: 0 10px; font-size: 13px; cursor: pointer;
-    font-family: var(--body); font-weight: 500;
-  }
-  .sel:focus { border-color: var(--accent); outline: none; }
+  .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; text-align: left; }
+  .step-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+  .step-num { font-family: var(--mono); font-weight: 600; color: var(--accent); font-size: 13px; margin-bottom: 6px; }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 12.5px; color: var(--muted); }
 
-  .token-badge {
-    font-family: var(--mono); font-size: 11px; background: var(--accent-wash); color: var(--accent-ink);
-    padding: 5px 10px; border-radius: 6px; font-weight: 600; margin-left: auto;
-    border: 1px solid rgba(12,107,99,.2);
+  .quick-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; text-align: left; }
+  .q-card {
+    background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r);
+    padding: 16px 18px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 14px;
   }
+  .q-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .q-icon { font-size: 28px; }
+  .q-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+  .q-sub { font-size: 12px; color: var(--muted); }
 
-  .block { margin-bottom: 24px; }
-  .lbl {
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--muted); display: block; margin-bottom: 8px; font-weight: 600;
+  /* Detail Formulaire */
+  .form-group { margin-bottom: 22px; }
+  .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; font-weight: 600; }
+  .field {
+    width: 100%; border: 1px solid var(--line-strong); background: var(--surface-2);
+    border-radius: var(--r); padding: 12px 16px; font-size: 14.5px; transition: all .15s;
   }
-  textarea.field, input.field {
-    width: 100%; border: 1px solid var(--line); background: var(--surface-2);
-    border-radius: var(--r); padding: 10px 14px; font-size: 14px; resize: vertical;
-    font-family: var(--body); transition: border-color .15s, background .15s;
-  }
-  textarea.field.mono { font-family: var(--mono); font-size: 12.5px; line-height: 1.6; }
-  textarea.field:focus, input.field:focus { border-color: var(--accent); background: var(--surface); outline: none; }
+  .field:focus { border-color: var(--accent); background: var(--surface); outline: none; box-shadow: 0 0 0 3px var(--accent-wash); }
+  textarea.field { resize: vertical; min-height: 100px; }
 
-  .npm-launch-box {
-    border: 1px solid var(--line); background: var(--surface-2);
-    border-radius: var(--r); padding: 14px 16px; margin-bottom: 24px;
+  .vars-box {
+    background: var(--accent-wash); border: 1px solid var(--accent);
+    border-radius: var(--r); padding: 20px; margin-bottom: 24px;
   }
-  .npm-title { font-family: var(--mono); font-size: 11px; color: var(--brass); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin-bottom: 8px; }
-  .npm-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-
-  .term-chips-container {
-    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
-  }
-  .term-chip {
-    font-family: var(--mono); font-size: 11px; background: var(--surface-2);
-    border: 1px solid var(--line-strong); border-radius: 6px; padding: 4px 8px;
-    cursor: pointer; transition: border-color .12s, background .12s; color: var(--ink-2);
-  }
-  .term-chip:hover { border-color: var(--accent); background: var(--accent-wash); color: var(--accent-ink); }
-
-  .vars-container {
-    border: 1px solid var(--accent); background: var(--accent-wash);
-    border-radius: var(--r); padding: 16px 18px; margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(12,107,99,.06);
-  }
-  .vars-title { font-family: var(--mono); font-size: 11px; color: var(--accent-ink); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; }
-  .var-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-  .var-field-group label { display: block; font-family: var(--mono); font-size: 11px; color: var(--accent-ink); margin-bottom: 4px; font-weight: 600; }
-  .var-field-group input {
+  .vars-header { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent-ink); text-transform: uppercase; margin-bottom: 14px; }
+  .var-row { margin-bottom: 14px; }
+  .var-row:last-child { margin-bottom: 0; }
+  .var-row label { display: block; font-family: var(--mono); font-size: 12px; color: var(--accent-ink); margin-bottom: 5px; font-weight: 600; }
+  .var-row input {
     width: 100%; border: 1px solid var(--line-strong); background: var(--surface);
-    border-radius: 6px; padding: 7px 10px; font-size: 13px; font-family: var(--body);
+    border-radius: 6px; padding: 10px 14px; font-size: 14px;
   }
-  .var-field-group input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 2px rgba(12,107,99,.2); }
 
-  .preview-box {
+  .preview-card {
     border: 1px solid var(--line-strong); background: var(--surface-2); border-radius: var(--r);
-    padding: 16px 18px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
-    white-space: pre-wrap; word-break: break-word; color: var(--ink-2); max-height: 360px; overflow-y: auto;
+    padding: 18px; font-family: var(--mono); font-size: 13px; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word; color: var(--ink); margin-bottom: 24px;
   }
-
-  .ai-response-container {
-    border: 1px solid var(--accent); background: var(--surface); border-radius: var(--r);
-    padding: 16px 18px; margin-top: 18px; box-shadow: var(--shadow);
-  }
-  .ai-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 600; }
-  .ai-text { font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: var(--ink); }
-
-  .d-foot { display: flex; gap: 10px; margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--line); flex-wrap: wrap; }
 
   .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px);
-    background: var(--ink); color: var(--ground); padding: 10px 20px; border-radius: 100px;
-    font-size: 13.5px; box-shadow: var(--shadow); opacity: 0; pointer-events: none;
-    transition: opacity .2s, transform .2s; z-index: 50; font-family: var(--mono); font-weight: 500;
+    position: fixed; bottom: 28px; left: 50%; transform: translate(-50%, 20px);
+    background: var(--ink); color: var(--ground); padding: 12px 24px; border-radius: 100px;
+    font-size: 14px; font-weight: 500; box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+    transition: all .2s; z-index: 50; font-family: var(--mono);
   }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
-  /* ---------- MODALS ---------- */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(6,14,13,.6); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+  /* Modals simples */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
   .modal-overlay[hidden] { display: none; }
-  .modal-card { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: var(--shadow); width: min(780px, 100%); max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
-  .modal-head { padding: 18px 24px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
-  .modal-head h2 { font-family: var(--display); font-size: 22px; font-weight: 600; margin: 0; }
-  .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
-  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-  .preset-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px; text-align: left; cursor: pointer; transition: border-color .15s, transform .15s; }
-  .preset-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .preset-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--ink); }
-  .preset-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
+  .modal-card { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); width: min(680px, 100%); padding: 24px; max-height: 90vh; overflow-y: auto; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .modal-head h3 { font-family: var(--display); font-size: 22px; margin: 0; }
 
-  @media (max-width: 880px) {
-    .topbar { padding: 10px 14px; gap: 10px; }
-    .brand h1 { font-size: 20px; }
-    .stats { width: 100%; order: 3; margin: 0; padding-top: 4px; border-top: 1px solid var(--line); }
-    .bar-actions { width: 100%; order: 2; justify-content: space-between; }
-    .search { flex: 1; }
-    .search input { width: 100%; }
-
-    .panes { display: block; height: calc(100vh - 120px); height: calc(100dvh - 120px); }
-    .listpane { height: 100%; border-right: 0; }
-    .detail { display: none; height: 100%; }
-
+  @media (max-width: 768px) {
+    .panes { grid-template-columns: 1fr; }
+    .detail { display: none; }
     .app.open .listpane { display: none; }
     .app.open .detail { display: block; }
-
-    .mobile-back-bar { display: block; }
-    .detail-inner { padding: 16px 16px 80px; }
-    .row { flex-direction: column; align-items: stretch; gap: 8px; }
-    .token-badge { margin-left: 0; text-align: center; }
-    .d-foot { flex-direction: column; }
-    .d-foot button { width: 100%; justify-content: center; }
-    .d-foot #btn-suppr { margin-left: 0 !important; }
-  }
-
-  @media (max-width: 540px) {
-    .var-grid { grid-template-columns: 1fr; }
+    .steps-grid, .quick-cards { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <header class="topbar">
-    <div class="brand">
-      <svg class="anvil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M2 12h20M7 12V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>
-      </svg>
+    <div class="brand" id="go-home">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"><path d="M2 12h20M7 12V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
       <h1>PromptForge</h1>
-      <p class="tag">Studio Specs IA</p>
+      <span class="tag">Simplicité</span>
     </div>
-    <div class="stats" id="stats"></div>
-    <div class="bar-actions">
-      <label class="search">
-        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <input id="q" type="search" placeholder="Rechercher une spec&#8230;" aria-label="Rechercher">
-      </label>
-      <button class="btn btn-primary" id="btn-coach" title="Générer un brief guidé étape par étape">🧠 Coach Brief</button>
-      <button class="btn" id="btn-scan" title="Scanner un dossier projet local">📁 Scanner Dossier</button>
-      <button class="btn" id="btn-api-config" title="Configurer l'IA gratuite (Ollama local / Gemini / Mistral)">🤖 Configuration IA</button>
-      <button class="btn" id="btn-gallery" title="Voir les modèles prêts à l'emploi">💡 Galerie</button>
-      <button class="btn" id="btn-export" title="Exporter JSON">Exporter</button>
-      <button class="btn" id="btn-import" title="Importer JSON">Importer</button>
-      <button class="btn" id="btn-new">+ Nouvelle Spec</button>
-      <input type="file" id="file" accept="application/json,.json" hidden>
-      <input type="file" id="dir" webkitdirectory directory multiple hidden>
+    <div class="top-btns">
+      <button class="btn btn-primary" id="btn-coach">🧠 Créer une demande guidée</button>
+      <button class="btn" id="btn-gallery">💡 Modèles prêts</button>
+      <button class="btn" id="btn-scan" title="Scanner un dossier projet">📁 Scanner dossier</button>
     </div>
   </header>
 
   <main class="panes">
     <section class="listpane">
-      <div class="filters" id="filters"></div>
+      <div class="list-head">
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="var(--muted)" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input id="q" type="search" placeholder="Chercher un modèle&#8230;">
+        </div>
+      </div>
       <ul class="list" id="list"></ul>
     </section>
+
     <section class="detail" id="detail"></section>
   </main>
 </div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- Modal Galerie d'Exemples -->
-<div class="modal-overlay" id="modal-gallery" hidden>
-  <div class="modal-card">
-    <div class="modal-head">
-      <h2>💡 Galerie d'Exemples Prêts à l'Emploi</h2>
-      <button class="btn btn-ghost" id="m-close-gallery">✕ Fermer</button>
-    </div>
-    <div class="modal-body">
-      <div class="gallery-grid" id="gallery-list"></div>
-    </div>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
-<!-- Modal Assistant-Coach de Brief Technique -->
+<!-- Modal Assistant-Coach Simple -->
 <div class="modal-overlay" id="modal-coach" hidden>
   <div class="modal-card">
     <div class="modal-head">
-      <h2>🧠 Assistant-Coach de Brief Technique</h2>
-      <button class="btn btn-ghost" id="m-close-coach">✕ Fermer</button>
+      <h3>🧠 Assistant de Demande Guidée</h3>
+      <button class="btn btn-ghost" id="m-close-coach">✕</button>
     </div>
-    <div class="modal-body">
-      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:12px; margin-bottom:16px;">
-        <div>
-          <label class="lbl" for="c-intent">Je veux</label>
-          <select class="sel" id="c-intent" style="width:100%">
-            <option value="display">Modifier un affichage / UI</option>
-            <option value="bug">Corriger un bug</option>
-            <option value="feature">Ajouter une fonctionnalité</option>
-            <option value="access">Gérer des accès / droits</option>
-            <option value="data">Modifier les données / BDD</option>
-            <option value="deploy">Publier une version / Déploiement</option>
-          </select>
-        </div>
-        <div>
-          <label class="lbl" for="c-area">Zone concernée</label>
-          <select class="sel" id="c-area" style="width:100%">
-            <option value="interface">Interface générale / Composants</option>
-            <option value="planning">Planning / Calendrier</option>
-            <option value="auth">Connexion et comptes</option>
-            <option value="database">Supabase / Base de données</option>
-            <option value="finance">Finance et statistiques</option>
-            <option value="deploy">GitHub et Cloudflare</option>
-            <option value="other">Autre zone</option>
-          </select>
-        </div>
-        <div>
-          <label class="lbl" for="c-depth">Niveau de précision</label>
-          <select class="sel" id="c-depth" style="width:100%">
-            <option value="complete">Brief complet (Recommandé)</option>
-            <option value="simple">Demande courte</option>
-            <option value="diagnostic">Diagnostic avant de coder</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="block">
-        <label class="lbl" for="c-idea">Décrivez votre idée avec vos mots</label>
-        <textarea class="field" id="c-idea" rows="3" placeholder="Ex: Dans la vue semaine, les cartes prennent trop de place et je veux tout voir en un coup d'œil..."></textarea>
-      </div>
-
-      <div class="block" style="display:flex; flex-wrap:wrap; gap:12px;">
-        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-existing" checked> Préserver l'existant</label>
-        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-responsive" checked> Vérifier mobile & ordi</label>
-        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-build" checked> Valider le build (`npm run build`)</label>
-        <label style="font-size:13px; display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" id="c-confirm"> Confirmer avant de coder</label>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button class="btn btn-primary" id="c-generate">🚀 Créer la Spec dans PromptForge</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Configuration IA (Ollama / Groq / OpenRouter / Gemini / Mistral) -->
-<div class="modal-overlay" id="modal-api" hidden>
-  <div class="modal-card">
-    <div class="modal-head">
-      <h2>🤖 Configuration IA Autonome (Gratuit & Local)</h2>
-      <button class="btn btn-ghost" id="m-close-api">✕ Fermer</button>
-    </div>
-    <div class="modal-body">
-      <div class="block">
-        <label class="lbl" for="cfg-provider">Fournisseur d'IA / API</label>
-        <select class="sel" id="cfg-provider" style="width:100%">
-          <option value="ollama">🦙 Ollama Local (http://localhost:11434) — 100% Gratuit & Hors-ligne</option>
-          <option value="gemini">🌟 Google Gemini API (gemini-2.0-flash)</option>
-          <option value="mistral">🇫🇷 Mistral AI (mistral-small-latest)</option>
-          <option value="groq">⚡ Groq Free API (llama-3.3-70b-versatile)</option>
-          <option value="openrouter">🌐 OpenRouter Free Tier (deepseek-r1:free)</option>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:18px;">Répondez à 2 questions simples pour générer un texte parfait pour l'IA.</p>
+    
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:16px;">
+      <div>
+        <label class="lbl">Que voulez-vous faire ?</label>
+        <select class="field" id="c-intent">
+          <option value="Corriger un bug">Corriger un bug</option>
+          <option value="Ajouter une fonction">Ajouter une fonctionnalité</option>
+          <option value="Modifier l'affichage">Modifier l'affichage / UI</option>
+          <option value="Modifier les données">Modifier les données / BDD</option>
         </select>
       </div>
-      <div class="block">
-        <label class="lbl" for="cfg-model">Modèle IA Sélectionné</label>
-        <input class="field" id="cfg-model" placeholder="ex: llama3, deepseek-r1, gemini-2.0-flash...">
+      <div>
+        <label class="lbl">Sur quelle partie ?</label>
+        <select class="field" id="c-area">
+          <option value="Interface générale">Interface générale</option>
+          <option value="Planning / Calendrier">Planning / Calendrier</option>
+          <option value="Connexion & Comptes">Connexion & Comptes</option>
+          <option value="Base de données">Base de données</option>
+        </select>
       </div>
-      <div class="block">
-        <label class="lbl" for="cfg-key">Clé API (Inutile pour Ollama Local)</label>
-        <input class="field" id="cfg-key" type="password" placeholder="Collez votre clé API si nécessaire (gsk_..., AIzaSy...)">
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button class="btn btn-primary" id="cfg-save">Enregistrer la Configuration</button>
-      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="lbl">Expliquez votre besoin avec vos mots</label>
+      <textarea class="field" id="c-idea" placeholder="Ex: Je veux que les boutons soient plus grands et que la couleur change au survol..."></textarea>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-primary" id="c-generate">✨ Générer mon texte prêt à l'emploi</button>
     </div>
   </div>
 </div>
+
+<!-- Modal Galerie Simple -->
+<div class="modal-overlay" id="modal-gallery" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>💡 Choisissez un Modèle Prêt à l'Emploi</h3>
+      <button class="btn btn-ghost" id="m-close-gallery">✕</button>
+    </div>
+    <div class="quick-cards" id="gallery-list"></div>
+  </div>
+</div>
+
+<input type="file" id="dir" webkitdirectory directory multiple hidden>
 
 <script>
 (function () {
   "use strict";
 
-  var KEY = "promptforge.specs.v1";
-  var KEY_API = "promptforge.api_config.v1";
-
-  var FORMATS = [
-    { id: "claude-md", nom: "CLAUDE.md", ext: ".md", color: "#0C6B63" },
-    { id: "agents-md", nom: "AGENTS.md", ext: ".md", color: "#5D6E93" },
-    { id: "cursorrules", nom: ".cursorrules", ext: "", color: "#7E5DA8" },
-    { id: "system-prompt", nom: "System Prompt", ext: ".txt", color: "#C56B3E" },
-    { id: "json-spec", nom: "JSON Spec", ext: ".json", color: "#3E7431" }
-  ];
-
-  var MODELS = [
-    { id: "claude-3-7-sonnet", nom: "Claude 3.7 / 3.5 Sonnet", rate: 0.0030, ratio: 3.7 },
-    { id: "claude-3-5-haiku", nom: "Claude 3.5 Haiku", rate: 0.0008, ratio: 3.8 },
-    { id: "gpt-4o", nom: "GPT-4o", rate: 0.0025, ratio: 3.7 },
-    { id: "gpt-4o-mini", nom: "GPT-4o-mini", rate: 0.00015, ratio: 3.8 },
-    { id: "gemini-2-flash", nom: "Gemini 2.0 Flash", rate: 0.00010, ratio: 4.0 },
-    { id: "gemini-1-5-pro", nom: "Gemini 1.5 Pro", rate: 0.00125, ratio: 3.9 },
-    { id: "deepseek-r1", nom: "DeepSeek R1 / V3", rate: 0.00014, ratio: 3.8 }
-  ];
-
-  var TECH_VOCABULARY = [
-    { name: "Mise en page (Layout)", text: "Revoir la mise en page sans modifier la logique métier." },
-    { name: "Responsive Mobile", text: "Le rendu doit rester fluide et parfaitement responsive sur mobile et ordinateur." },
-    { name: "Débordement (Overflow)", text: "Corriger le débordement horizontal et les éléments rognés." },
-    { name: "Régression", text: "Vérifier qu'aucune régression n'est introduite sur le code existant." },
-    { name: "Gestion d'erreurs", text: "Ajouter une gestion d'erreurs robuste avec messages utilisateurs réactifs." },
-    { name: "Cas d'usage", text: "Valider le cas d'usage principal avec les données de test." },
-    { name: "Migration BDD", text: "Créer une migration SQL réversible et propre." },
-    { name: "RLS / Sécurité", text: "Sécuriser également l'accès avec une politique RLS restrictive." },
-    { name: "Build Validation", text: "Valider la compilation sans erreurs via npm run build." }
-  ];
+  var KEY = "promptforge.simple.v1";
 
   var PRESETS = [
     {
-      id: "preset-tech-brief",
-      nom: "🧠 Assistant Demande Technique (Brief Structuré)",
-      format: "claude-md",
-      description: "Brief complet d'intention, périmètre, contraintes et critères d'acceptation.",
-      template: "## Objectif\n{{type_intention}} dans la zone « {{zone_concernee}} ».\n\n## Description du Besoin\n{{description_besoin}}\n\n## Périmètre & Fichiers de Référence\n- Zone : {{zone_concernee}}\n- Ne modifier que les fichiers strictement nécessaires.\n\n## Contraintes & Règles\n- {{regle_existant}}\n- {{regle_responsive}}\n- {{regle_build}}\n\n## Critères d'Acceptation\n- Le résultat est directement testable et utilisable.\n- Aucune régression n'est introduite.\n- Valider la syntaxe et la compilation.",
-      values: {
-        type_intention: "Ajouter une fonctionnalité",
-        zone_concernee: "Interface générale",
-        description_besoin: "Créer une vue synthétique des cartes avec filtres réactifs.",
-        regle_existant: "Préserver l'existant hors du périmètre demandé.",
-        regle_responsive: "Vérifier le rendu sur mobile et ordinateur.",
-        regle_build: "Valider la compilation avec npm run build."
-      }
-    },
-    {
-      id: "preset-architect",
-      nom: "💻 Master Spec Agent (CLAUDE.md / AGENTS.md)",
-      format: "claude-md",
-      description: "Spécification d'architecture et consignes de code pour les agents IA.",
-      template: "# Projet {{nom_projet}}\n\n## Vision & Objectif\n{{objectif_projet}}\n\n## Stack Technique\n- Langage & Framework : {{stack_technique}}\n- Style CSS : {{style_css}}\n\n## Directives Strictes pour l'Agent IA\n- Toujours respecter la structure du codebase existant.\n- Vérifier les lints et la syntaxe avant d'achever une tâche.\n- Ne jamais supprimer de code ou d'assertions sans autorisation.\n\n## Commandes de Vérification\n```bash\n{{commande_test}}\n```",
-      values: { nom_projet: "MonProjet", objectif_projet: "Créer une webapp ultra rapide et élégante", stack_technique: "HTML5, Vanilla JS", style_css: "Vanilla CSS Tokens", commande_test: "npm test" }
-    },
-    {
       id: "preset-email",
-      nom: "✉️ Rédaction d'Email Professionnel",
-      format: "system-prompt",
-      description: "Générateur d'emails professionnels convaincants avec ton sur-mesure.",
-      template: "Rédige un e-mail professionnel à destination de {{destinataire}}.\n\nObjet de l'e-mail : {{sujet_email}}\n\nTon souhaité : {{ton_souhaite}}\n\nPoints clés à inclure :\n- {{point_1}}\n- {{point_2}}\n\nAppel à l'action final : {{appel_action}}",
-      values: { destinataire: "M. le Directeur", sujet_email: "Proposition de partenariat", ton_souhaite: "professionnel et chaleureux", point_1: "Présentation des résultats récents", point_2: "Proposition de rendez-vous de 15 min", appel_action: "Confirmer vos disponibilités pour cette semaine" }
+      icon: "✉️",
+      nom: "Email Professionnel",
+      desc: "Rédiger un mail clair et convaincant",
+      template: "Rédige un e-mail professionnel à destination de {{destinataire}}.\n\nSujet : {{sujet}}\nTon souhaité : {{ton}}\n\nPoints clés :\n- {{point_1}}\n- {{point_2}}\n\nAppel à l'action final : {{appel_action}}",
+      values: { destinataire: "M. le Directeur", sujet: "Demande d'information", ton: "Professionnel et courtois", point_1: "Présentation de la demande", point_2: "Détails importants", appel_action: "Rappeler cette semaine" }
     },
     {
       id: "preset-correction",
-      nom: "✍️ Correction & Réécriture de Texte",
-      format: "system-prompt",
-      description: "Corrige les fautes d'orthographe, grammaire et améliore la fluidité du style.",
-      template: "Tu es un correcteur et rédacteur professionnel.\n\nObjectif :\nCorriger les fautes et améliorer la fluidité du texte suivant.\n\nNiveau de reformulation : {{niveau_reformulation}}\n\nTexte à corriger :\n{{texte_brut}}",
-      values: { niveau_reformulation: "réécriture fluide et naturelle", texte_brut: "Bonjour je vous contact car je voulait savoir si vous etiez dispo..." }
+      icon: "✍️",
+      nom: "Correction de Texte",
+      desc: "Corriger les fautes et améliorer la fluidité",
+      template: "Tu es un correcteur professionnel.\n\nCorrige les fautes et améliore le style du texte suivant :\n\n{{texte}}",
+      values: { texte: "Bonjour je vous ecrit pour vous demander des nouvelles..." }
     },
     {
       id: "preset-resume",
-      nom: "📄 Résumé Synthétique de Document",
-      format: "system-prompt",
-      description: "Extrait les idées clés, décisions et actions d'un texte long.",
-      template: "Analyse le document suivant et fournis une synthèse structurée.\n\nFormat de la réponse :\n1. Résumé en 3 puces principales.\n2. Décisions clés identifiées.\n3. Prochaines actions à mener.\n\nSujet du document : {{sujet_doc}}\n\nContenu :\n{{contenu_doc}}",
-      values: { sujet_doc: "Compte-rendu de réunion produit", contenu_doc: "Collez votre texte long ici..." }
+      icon: "📄",
+      nom: "Résumé Synthétique",
+      desc: "Resumer un long texte en 3 points",
+      template: "Analyse et résume ce texte en 3 points essentiels et 1 conclusion :\n\n{{texte_long}}",
+      values: { texte_long: "Collez votre texte long ici..." }
     },
     {
-      id: "preset-social",
-      nom: "📣 Générateur de Post LinkedIn / Réseaux",
-      format: "system-prompt",
-      description: "Rédige un post percutant avec accroche et appel à l'action.",
-      template: "Rédige un post percutant pour {{reseau_social}} sur le sujet : {{sujet_post}}.\n\nStructure :\n- Une accroche captivante (hook).\n- L'histoire ou la leçon en {{nb_lignes}} lignes.\n- 3 conseils pratiques.\n- Une question d'engagement à la fin.",
-      values: { reseau_social: "LinkedIn", sujet_post: "L'importance de la simplicité dans les projets web", nb_lignes: "5" }
+      id: "preset-code",
+      icon: "💻",
+      nom: "Demande de Code Web",
+      desc: "Demander la création d'un composant web",
+      template: "Tu es un développeur expert.\nCrée un composant {{composant}} en HTML/CSS/JS.\n\nObjectif : {{objectif}}\nCouleur souhaitée : {{couleur}}\nContraintes : Simple, rapide, responsive.",
+      values: { composant: "Bouton interactif", objectif: "Changer de couleur au clic", couleur: "Vert Émeraude" }
     }
   ];
 
-  var state = {
-    specs: [], sel: null, filtreFmt: "tous", q: "", modelId: "claude-3-7-sonnet",
-    apiCfg: { provider: "ollama", model: "llama3", key: "" }
-  };
+  var state = { specs: [], sel: null, q: "" };
 
-  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-  function getFmt(id) { for (var i = 0; i < FORMATS.length; i++) if (FORMATS[i].id === id) return FORMATS[i]; return FORMATS[0]; }
-  function getModel(id) { for (var i = 0; i < MODELS.length; i++) if (MODELS[i].id === id) return MODELS[i]; return MODELS[0]; }
-  function getSpec(id) { for (var i = 0; i < state.specs.length; i++) if (state.specs[i].id === id) return state.specs[i]; return null; }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
-  var toastT;
   function toast(msg) {
     var el = document.getElementById("toast");
     el.textContent = msg; el.classList.add("on");
-    clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("on"); }, 2600);
+    setTimeout(function () { el.classList.remove("on"); }, 2800);
   }
 
   function charger() {
@@ -583,32 +338,21 @@
         var d = JSON.parse(raw);
         if (d && Array.isArray(d.specs) && d.specs.length > 0) state.specs = d.specs;
       }
-      var rawApi = localStorage.getItem(KEY_API);
-      if (rawApi) {
-        var cfg = JSON.parse(rawApi);
-        if (cfg) state.apiCfg = cfg;
-      }
     } catch (e) {}
     if (!state.specs.length) {
       state.specs = PRESETS.map(function (p) {
-        return {
-          id: p.id, nom: p.nom, format: p.format, description: p.description,
-          template: p.template, values: p.values || {}, majLe: new Date().toISOString()
-        };
+        return { id: p.id, nom: p.nom, desc: p.desc, icon: p.icon, template: p.template, values: p.values || {} };
       });
       sauver();
     }
   }
+
   function sauver() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ v: 1, specs: state.specs }));
-      localStorage.setItem(KEY_API, JSON.stringify(state.apiCfg));
-    } catch (e) { toast("Sauvegarde impossible dans le navigateur."); }
+    try { localStorage.setItem(KEY, JSON.stringify({ specs: state.specs })); } catch (e) {}
   }
 
   function detectVars(tpl) {
-    var re = /\{\{([a-zA-Z0-9_]+)\}\}/g;
-    var match, vars = [], seen = {};
+    var re = /\{\{([a-zA-Z0-9_]+)\}\}/g, match, vars = [], seen = {};
     while ((match = re.exec(tpl || "")) !== null) {
       if (!seen[match[1]]) { seen[match[1]] = true; vars.push(match[1]); }
     }
@@ -623,598 +367,118 @@
     });
   }
 
-  function countTokens(str, modelId) {
-    if (!str) return 0;
-    var m = getModel(modelId || state.modelId);
-    return Math.ceil(str.length / m.ratio);
-  }
-
-  function calcCost(tokens, modelId) {
-    var m = getModel(modelId || state.modelId);
-    var cost = (tokens / 1000) * m.rate;
-    if (cost < 0.0001 && cost > 0) return "<$0.0001";
-    return "$" + cost.toFixed(4);
-  }
-
-  function meFiltrees() {
-    var q = state.q.trim().toLowerCase();
-    return state.specs.filter(function (s) {
-      if (state.filtreFmt !== "tous" && s.format !== state.filtreFmt) return false;
-      if (!q) return true;
-      var blob = (s.nom + " " + s.description + " " + s.template + " " + getFmt(s.format).nom).toLowerCase();
-      return blob.indexOf(q) !== -1;
-    }).sort(function (a, b) { return new Date(b.majLe) - new Date(a.majLe); });
-  }
-
-  function renderStats() {
-    var total = state.specs.length;
-    var totalTokens = 0;
-    state.specs.forEach(function (s) { totalTokens += countTokens(compileSpec(s)); });
-    var h = "<span><b>" + total + "</b> spec" + (total > 1 ? "s" : "") + "</span>" +
-            "<span>~<b>" + totalTokens.toLocaleString("fr-FR") + "</b> tokens au total</span>";
-    document.getElementById("stats").innerHTML = h;
-  }
-
-  function renderFiltres() {
-    var f = document.getElementById("filters");
-    var compte = {};
-    state.specs.forEach(function (s) { compte[s.format] = (compte[s.format] || 0) + 1; });
-
-    var h = "<button class='chip' data-fmt='tous' aria-pressed='" + (state.filtreFmt === "tous") + "'>Tous <span class='n'>" + state.specs.length + "</span></button>";
-    FORMATS.forEach(function (fmt) {
-      var n = compte[fmt.id] || 0;
-      if (!n && state.filtreFmt !== fmt.id) return;
-      h += "<button class='chip' data-fmt='" + fmt.id + "' aria-pressed='" + (state.filtreFmt === fmt.id) + "'>" + fmt.nom + " <span class='n'>" + n + "</span></button>";
-    });
-    f.innerHTML = h;
-  }
-
   function renderListe() {
     var ul = document.getElementById("list");
-    var items = meFiltrees();
-    if (!items.length) {
-      ul.innerHTML = "<li style='padding:30px 20px; text-align:center; color:var(--muted); font-size:13px;'>Aucune spec trouvée.<br>Cliquez sur « + Nouvelle Spec ».</li>";
-      return;
-    }
+    var q = state.q.toLowerCase().trim();
+    var items = state.specs.filter(function (s) {
+      return !q || (s.nom + " " + s.desc).toLowerCase().indexOf(q) !== -1;
+    });
+
     ul.innerHTML = items.map(function (s) {
-      var fmt = getFmt(s.format);
-      var vars = detectVars(s.template);
-      var compiled = compileSpec(s);
-      var tok = countTokens(compiled, state.modelId);
-      return "<li><button class='card' data-id='" + s.id + "' aria-current='" + (state.sel === s.id) + "' style='--fmt-color:" + fmt.color + "'>" +
-        "<div class='card-top'>" +
-          "<span class='card-name'>" + (esc(s.nom) || "Sans titre") + "</span>" +
-        "</div>" +
-        "<div class='card-meta'>" +
-          "<span class='pill' style='--fmt-color:" + fmt.color + "'>" + esc(fmt.nom) + "</span>" +
-          "<span class='tag-var'>~" + tok.toLocaleString("fr-FR") + " tok</span>" +
-          (vars.length ? "<span class='tag-var'>" + vars.length + " var" + (vars.length > 1 ? "s" : "") + "</span>" : "") +
-        "</div>" +
-        (s.description ? "<div class='card-desc'>" + esc(s.description) + "</div>" : "") +
+      return "<li><button class='card' data-id='" + s.id + "' aria-current='" + (state.sel === s.id) + "'>" +
+        "<div class='card-title'>" + (s.icon || "📋") + " " + esc(s.nom) + "</div>" +
+        "<div class='card-desc'>" + esc(s.desc || "") + "</div>" +
       "</button></li>";
     }).join("");
   }
 
+  function renderHome() {
+    var d = document.getElementById("detail");
+    d.innerHTML = "<div class='welcome-box'>" +
+      "<h2>Bienvenue sur PromptForge 👋</h2>" +
+      "<p>L'outil le plus simple pour créer des demandes parfaites et obtenir d'excellentes réponses des IAs (Claude, ChatGPT, Gemini...).</p>" +
+
+      "<div class='steps-grid'>" +
+        "<div class='step-card'><div class='step-num'>ÉTAPE 1</div><div class='step-title'>Choisis un modèle</div><div class='step-desc'>Sélectionne un modèle prêt à l'emploi à gauche ou dans la galerie.</div></div>" +
+        "<div class='step-card'><div class='step-num'>ÉTAPE 2</div><div class='step-title'>Remplis les cases</div><div class='step-desc'>Renseigne les quelques informations demandées dans le formulaire.</div></div>" +
+        "<div class='step-card'><div class='step-num'>ÉTAPE 3</div><div class='step-title'>Copie ton texte</div><div class='step-desc'>Clique sur Copier et colle le résultat directement à ton IA !</div></div>" +
+      "</div>" +
+
+      "<h3 style='font-family:var(--display); font-size:22px; text-align:left; margin-bottom:16px;'>Exemples populaires à essayer :</h3>" +
+      "<div class='quick-cards'>" +
+        PRESETS.map(function(p, i) {
+          return "<div class='q-card' data-preset-index='" + i + "'>" +
+            "<div class='q-icon'>" + p.icon + "</div>" +
+            "<div><div class='q-name'>" + esc(p.nom) + "</div><div class='q-sub'>" + esc(p.desc) + "</div></div>" +
+          "</div>";
+        }).join("") +
+      "</div>" +
+    "</div>";
+  }
+
   function renderDetail() {
     var d = document.getElementById("detail");
-    var s = getSpec(state.sel);
-    if (!s) {
-      d.innerHTML = "<div class='blank'>" +
-        "<h2>Studio de Specs IA</h2>" +
-        "<p>Sélectionnez un modèle de prompt à gauche ou créez-en un nouveau. PromptForge détectera automatiquement les variables <code>{{variable}}</code> pour générer des formulaires dynamiques.</p>" +
-        "</div>";
-      return;
-    }
+    var s = state.specs.find(function (x) { return x.id === state.sel; });
+    if (!s) { renderHome(); return; }
 
-    var fmt = getFmt(s.format);
     var vars = detectVars(s.template);
     var compiled = compileSpec(s);
-    var tok = countTokens(compiled, state.modelId);
-    var costStr = calcCost(tok, state.modelId);
 
     var h = "<div class='detail-inner'>";
-    h += "<div class='mobile-back-bar'><button class='btn btn-ghost' id='back'>← Retour aux specs</button></div>";
-    h += "<input class='name-input' id='f-nom' value='" + esc(s.nom) + "' placeholder='Nom de la spec (ex: Spec Claude Code)' aria-label='Nom'>";
+    h += "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;'>" +
+           "<button class='btn btn-ghost' id='back'>← Retour</button>" +
+           "<button class='btn btn-ghost' id='btn-del' style='color:var(--danger)'>Supprimer</button>" +
+         "</div>";
 
-    h += "<div class='row'>";
-    h += "<select class='sel' id='f-format' aria-label='Format'>" + FORMATS.map(function (f) {
-      return "<option value='" + f.id + "'" + (s.format === f.id ? " selected" : "") + ">" + f.nom + "</option>";
-    }).join("") + "</select>";
-
-    h += "<select class='sel' id='f-model' aria-label='Modèle IA'>" + MODELS.map(function (m) {
-      return "<option value='" + m.id + "'" + (state.modelId === m.id ? " selected" : "") + ">" + m.nom + " ($" + (m.rate*1000).toFixed(2) + "/1M tok)</option>";
-    }).join("") + "</select>";
-
-    h += "<span class='token-badge'>~" + tok.toLocaleString("fr-FR") + " tokens (" + costStr + ")</span>";
-    h += "</div>";
-
-    if (s.npmScripts && s.npmScripts.length) {
-      h += "<div class='npm-launch-box'><div class='npm-title'>🚀 Commandes Lancement Scannées</div><div class='npm-btns'>" +
-        s.npmScripts.map(function (sc) {
-          return "<button class='btn' data-copy-cmd='" + esc(sc.cmd) + "'><code>" + esc(sc.cmd) + "</code></button>";
-        }).join("") +
-      "</div></div>";
-    }
-
-    h += "<div class='block'><label class='lbl' for='f-desc'>Description / Usage</label>" +
-         "<input class='field' id='f-desc' value='" + esc(s.description) + "' placeholder='A quoi sert cette spec...'></div>";
-
-    h += "<div class='block'><label class='lbl' for='f-tpl'>Modèle de Spec (utilisez {{variable}} pour rendre dynamique)</label>" +
-         "<textarea class='field mono' id='f-tpl' rows='9' placeholder='Rédigez votre prompt avec des {{variables}}...'>" + esc(s.template) + "</textarea></div>";
-
-    // Vocabulaire technique suggéré
-    h += "<div class='block'><span class='lbl'>📚 Vocabulaire Technique Suggéré (Cliquer pour ajouter)</span>" +
-         "<div class='term-chips-container'>" + TECH_VOCABULARY.map(function(tv) {
-           return "<button class='term-chip' data-add-text='" + esc(tv.text) + "' title='" + esc(tv.text) + "'>+ " + esc(tv.name) + "</button>";
-         }).join("") + "</div></div>";
+    h += "<h2 style='font-family:var(--display); font-size:28px; margin-bottom:6px;'>" + (s.icon || "📋") + " " + esc(s.nom) + "</h2>";
+    h += "<p style='color:var(--muted); margin-bottom:24px; font-size:14px;'>" + esc(s.desc || "") + "</p>";
 
     if (vars.length > 0) {
-      h += "<div class='vars-container'><div class='vars-title'><span>Formulaire Dynamique de Variables (" + vars.length + ")</span></div>" +
-           "<div class='var-grid'>" + vars.map(function (v) {
-             var val = (s.values && s.values[v] !== undefined) ? s.values[v] : "";
-             return "<div class='var-field-group'><label for='v-" + esc(v) + "'>{{" + esc(v) + "}}</label>" +
-                    "<input id='v-" + esc(v) + "' data-var='" + esc(v) + "' value='" + esc(val) + "' placeholder='Valeur pour " + esc(v) + "'></div>";
-           }).join("") + "</div></div>";
+      h += "<div class='vars-box'>" +
+        "<div class='vars-header'>✍️ Remplissez les informations ci-dessous :</div>" +
+        vars.map(function (v) {
+          var val = (s.values && s.values[v] !== undefined) ? s.values[v] : "";
+          return "<div class='var-row'>" +
+            "<label>Case {" + esc(v) + "}</label>" +
+            "<input data-var='" + esc(v) + "' value='" + esc(val) + "' placeholder='Entrez " + esc(v) + "...'>" +
+          "</div>";
+        }).join("") +
+      "</div>";
     }
 
-    h += "<div class='block'><span class='lbl'>Aperçu Compilé du Prompt Final</span>" +
-         "<div class='preview-box' id='preview-box'>" + esc(compiled) + "</div></div>";
+    h += "<div class='form-group'>" +
+           "<span class='lbl'>Votre Texte Prêt à l'Emploi pour l'IA</span>" +
+           "<div class='preview-card' id='preview-box'>" + esc(compiled) + "</div>" +
+         "</div>";
 
-    h += "<div class='ai-response-container' id='ai-response-area' hidden>" +
-         "<div class='ai-head'><span>Réponse IA (" + esc(state.apiCfg.provider) + ")</span><button class='btn btn-ghost' id='ai-copy-btn'>Copier</button></div>" +
-         "<div class='ai-text' id='ai-response-text'>...</div></div>";
+    h += "<div style='display:flex; gap:12px;'>" +
+           "<button class='btn btn-primary' id='btn-copy' style='flex:1; height:46px; font-size:15px; justify-content:center;'>📋 Copier ce texte pour l'IA</button>" +
+         "</div>";
 
-    h += "<div class='d-foot'>" +
-      "<button class='btn btn-primary' id='btn-copy-compiled'>Copier le Prompt Compilé</button>" +
-      "<button class='btn' id='btn-run-ai' style='border-color:var(--accent); color:var(--accent-ink);'>▶ Tester avec l'IA (" + esc(state.apiCfg.provider) + ")</button>" +
-      "<button class='btn' id='btn-export-file'>Télécharger (" + esc(fmt.nom) + ")</button>" +
-      "<button class='btn btn-ghost btn-danger' id='btn-suppr' style='margin-left:auto'>Supprimer</button>" +
-      "</div></div>";
+    h += "</div>";
 
     d.innerHTML = h;
     d.scrollTop = 0;
-    brancherDetail(s);
-  }
 
-  function brancherDetail(s) {
-    var nom = document.getElementById("f-nom");
-    if (nom) nom.addEventListener("input", function () { s.nom = nom.value; s.majLe = new Date().toISOString(); sauver(); renderListe(); });
-
-    var fmt = document.getElementById("f-format");
-    if (fmt) fmt.addEventListener("change", function () { s.format = this.value; s.majLe = new Date().toISOString(); sauver(); renderListe(); renderDetail(); });
-
-    var mod = document.getElementById("f-model");
-    if (mod) mod.addEventListener("change", function () {
-      state.modelId = this.value;
-      updatePreview(s);
-      renderStats();
-    });
-
-    var desc = document.getElementById("f-desc");
-    if (desc) desc.addEventListener("input", function () { s.description = desc.value; s.majLe = new Date().toISOString(); sauver(); renderListe(); });
-
-    var tpl = document.getElementById("f-tpl");
-    if (tpl) tpl.addEventListener("input", function () {
-      s.template = tpl.value;
-      s.majLe = new Date().toISOString();
-      sauver();
-      var newVars = detectVars(tpl.value);
-      var oldVars = Object.keys(s.values || {});
-      if (newVars.join(",") !== oldVars.join(",")) {
-        renderDetail();
-      } else {
-        updatePreview(s);
-      }
-      renderListe(); renderStats();
-    });
-
-    Array.prototype.forEach.call(document.querySelectorAll("[data-add-text]"), function (btn) {
-      btn.addEventListener("click", function () {
-        var txt = btn.getAttribute("data-add-text");
-        s.template = (s.template || "") + "\n- " + txt;
-        s.majLe = new Date().toISOString();
-        sauver();
-        renderDetail();
-        renderListe(); renderStats();
-        toast("Expression ajoutée au modèle !");
-      });
-    });
-
-    Array.prototype.forEach.call(document.querySelectorAll("[data-var]"), function (inp) {
+    Array.prototype.forEach.call(d.querySelectorAll("[data-var]"), function (inp) {
       inp.addEventListener("input", function () {
-        var key = inp.getAttribute("data-var");
-        s.values = s.values || {};
-        s.values[key] = inp.value;
+        var k = inp.getAttribute("data-var");
+        s.values = s.values || {}; s.values[k] = inp.value;
         sauver();
-        updatePreview(s);
+        document.getElementById("preview-box").textContent = compileSpec(s);
       });
     });
 
-    Array.prototype.forEach.call(document.querySelectorAll("[data-copy-cmd]"), function (btn) {
-      btn.addEventListener("click", function () {
-        var cmd = btn.getAttribute("data-copy-cmd");
-        if (navigator.clipboard) navigator.clipboard.writeText(cmd);
+    document.getElementById("btn-copy").addEventListener("click", function () {
+      var text = compileSpec(s);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+        toast("✨ Texte copié ! Vous pouvez le coller dans votre IA.");
+      }
+    });
 
-        fetch("http://localhost:3737/run-command", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ command: cmd })
-        }).then(function(res) { return res.json(); }).then(function(data) {
-          if (data && data.status === "started") {
-            toast("🚀 Terminal ancré lancé : " + cmd);
-          } else {
-            toast("Commande copiée : " + cmd);
-          }
-        }).catch(function() {
-          toast("Commande copiée ! (Lance 'node server.js' pour l'exécuter en 1 clic)");
-        });
-      });
+    document.getElementById("btn-del").addEventListener("click", function () {
+      if (confirm("Supprimer ce modèle ?")) {
+        state.specs = state.specs.filter(function (x) { return x.id !== s.id; });
+        state.sel = null; sauver(); renderListe(); renderHome();
+      }
     });
 
     var back = document.getElementById("back");
     if (back) back.addEventListener("click", function () { document.getElementById("app").classList.remove("open"); });
-
-    document.getElementById("btn-copy-compiled").addEventListener("click", function () {
-      var compiled = compileSpec(s);
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(compiled).then(function () {
-          toast("Prompt compilé copié dans le presse-papier !");
-        });
-      }
-    });
-
-    document.getElementById("btn-run-ai").addEventListener("click", function () {
-      executerIA(s);
-    });
-
-    document.getElementById("btn-export-file").addEventListener("click", function () {
-      var compiled = compileSpec(s);
-      var fmtInfo = getFmt(s.format);
-      var fname = (s.nom || "spec").toLowerCase().replace(/[^a-z0-9]/g, "-") + fmtInfo.ext;
-      if (fmtInfo.id === "claude-md") fname = "CLAUDE.md";
-      else if (fmtInfo.id === "agents-md") fname = "AGENTS.md";
-      else if (fmtInfo.id === "cursorrules") fname = ".cursorrules";
-
-      var blob = new Blob([compiled], { type: "text/plain;charset=utf-8" });
-      var a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = fname;
-      document.body.appendChild(a); a.click();
-      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-      toast("Fichier " + fname + " téléchargé.");
-    });
-
-    document.getElementById("btn-suppr").addEventListener("click", function () {
-      if (!confirm("Supprimer la spec « " + (s.nom || "Sans titre") + " » ?")) return;
-      state.specs = state.specs.filter(function (x) { return x.id !== s.id; });
-      state.sel = null; sauver();
-      document.getElementById("app").classList.remove("open");
-      renderListe(); renderStats(); renderFiltres(); renderDetail();
-      toast("Spec supprimée.");
-    });
   }
 
-  function executerIA(spec) {
-    var area = document.getElementById("ai-response-area");
-    var txtEl = document.getElementById("ai-response-text");
-    if (!area || !txtEl) return;
-    area.hidden = false;
-
-    var p = String(state.apiCfg.provider || "").trim().toLowerCase();
-    var key = String(state.apiCfg.key || "").trim();
-    var model = String(state.apiCfg.model || "").trim();
-
-    txtEl.textContent = "Connexion à " + (p || "l'IA") + " (" + (model || "défaut") + ")...";
-    var promptCompile = compileSpec(spec);
-
-    if (p.indexOf("gemini") !== -1 || p.indexOf("google") !== -1) {
-      if (!key) {
-        txtEl.textContent = "⚠️ Veuillez ouvrir '🤖 Configuration IA' et coller votre clé API Gemini.";
-        return;
-      }
-      var geminiModel = model || "gemini-2.0-flash";
-      var geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent?key=" + encodeURIComponent(key);
-
-      fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptCompile }] }]
-        })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-          txtEl.textContent = data.candidates[0].content.parts.map(function(pt) { return pt.text; }).join("\n");
-          toast("Réponse Gemini reçue !");
-        } else if (data.error) {
-          txtEl.textContent = "❌ Erreur Gemini API (" + (data.error.code || "") + ") : " + data.error.message;
-        } else {
-          txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
-        }
-      }).catch(function(err) {
-        txtEl.textContent = "❌ Erreur de réseau vers Gemini : " + err.message;
-      });
-    } else if (p.indexOf("ollama") !== -1) {
-      fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: model || "llama3", prompt: promptCompile, stream: false })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        txtEl.textContent = data.response || "Aucune réponse reçue d'Ollama.";
-        toast("Réponse Ollama reçue !");
-      }).catch(function(err) {
-        txtEl.textContent = "Erreur de connexion à Ollama (" + err.message + "). Vérifie qu'Ollama tourne bien sur http://localhost:11434.";
-      });
-    } else if (p.indexOf("mistral") !== -1) {
-      if (!key) {
-        txtEl.textContent = "⚠️ Veuillez d'abord ajouter votre clé API Mistral dans '🤖 Configuration IA'.";
-        return;
-      }
-      var mistralModel = model || "mistral-small-latest";
-      fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + key
-        },
-        body: JSON.stringify({
-          model: mistralModel,
-          messages: [{ role: "user", content: promptCompile }]
-        })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-          txtEl.textContent = data.choices[0].message.content;
-          toast("Réponse Mistral reçue !");
-        } else if (data.error || data.message) {
-          txtEl.textContent = "❌ Erreur Mistral API : " + (data.message || JSON.stringify(data));
-        } else {
-          txtEl.textContent = "Réponse Mistral : " + JSON.stringify(data);
-        }
-      }).catch(function(err) {
-        txtEl.textContent = "❌ Erreur de réseau vers Mistral : " + err.message;
-      });
-    } else if (p.indexOf("groq") !== -1 || p.indexOf("openrouter") !== -1) {
-      var url = p.indexOf("groq") !== -1 ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + key
-        },
-        body: JSON.stringify({
-          model: model || (p.indexOf("groq") !== -1 ? "llama-3.3-70b-versatile" : "deepseek/deepseek-r1:free"),
-          messages: [{ role: "user", content: promptCompile }]
-        })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        if (data.choices && data.choices[0]) {
-          txtEl.textContent = data.choices[0].message.content;
-          toast("Réponse " + p + " reçue !");
-        } else {
-          txtEl.textContent = "Erreur API : " + JSON.stringify(data);
-        }
-      }).catch(function(err) {
-        txtEl.textContent = "Erreur de requête " + p + " : " + err.message;
-      });
-    } else {
-      txtEl.textContent = "Fournisseur IA (" + p + ") configuré.";
-    }
-
-    document.getElementById("ai-copy-btn").onclick = function() {
-      if (navigator.clipboard) navigator.clipboard.writeText(txtEl.textContent);
-      toast("Réponse IA copiée !");
-    };
-  }
-
-  function updatePreview(s) {
-    var compiled = compileSpec(s);
-    var pb = document.getElementById("preview-box");
-    if (pb) pb.textContent = compiled;
-    var m = getModel(state.modelId);
-    var tok = countTokens(compiled, state.modelId);
-    var costStr = calcCost(tok, state.modelId);
-    var tb = document.querySelector(".token-badge");
-    if (tb) tb.textContent = "~" + tok.toLocaleString("fr-FR") + " tokens (" + costStr + " - " + m.nom + ")";
-  }
-
-  /* ---------- SCANNER INTELLIGENT DE DOSSIER ---------- */
-  function lireTexte(f) {
-    if (!f || f.size > 500000) return Promise.resolve("");
-    if (f.text) return f.text().then(function (t) { return t; }, function () { return ""; });
-    return new Promise(function (res) {
-      var r = new FileReader();
-      r.onload = function () { res(String(r.result)); };
-      r.onerror = function () { res(""); };
-      try { r.readAsText(f); } catch (e) { res(""); }
-    });
-  }
-
-  function classerFichier(path) {
-    var p = path.toLowerCase();
-    if (p.indexOf("planning") > -1 || p.indexOf("agenda") > -1 || p.indexOf("calendar") > -1) return "Planning";
-    if (p.indexOf("auth") > -1 || p.indexOf("login") > -1 || p.indexOf("session") > -1) return "Connexion & Auth";
-    if (p.indexOf("supabase") > -1 || p.indexOf("sql") > -1 || p.indexOf("migration") > -1) return "Base de données / BDD";
-    if (p.indexOf("finance") > -1 || p.indexOf("stat") > -1 || p.indexOf("kpi") > -1) return "Finance & Stats";
-    if (p.indexOf("component") > -1 || p.indexOf("css") > -1 || p.indexOf("ui") > -1 || p.indexOf("html") > -1) return "Interface UI";
-    return "Autres fichiers";
-  }
-
-  function analyserDossier(files) {
-    var pkgFile = null, readmeFile = null, folderName = "";
-    var categories = {};
-
-    for (var i = 0; i < files.length; i++) {
-      var f = files[i];
-      var rel = f.webkitRelativePath || f.name;
-      var parts = rel.split("/");
-      if (!folderName) folderName = parts[0];
-      var base = parts[parts.length - 1].toLowerCase();
-      if (base === "package.json" && parts.length <= 3) pkgFile = f;
-      if (base.indexOf("readme") === 0 && parts.length <= 3) readmeFile = f;
-
-      var cat = classerFichier(rel);
-      categories[cat] = categories[cat] || [];
-      if (categories[cat].length < 6) categories[cat].push(rel);
-    }
-
-    Promise.all([lireTexte(pkgFile), lireTexte(readmeFile)]).then(function(res) {
-      var pkg = null;
-      try { pkg = res[0] ? JSON.parse(res[0]) : null; } catch(e){}
-      var pName = (pkg && pkg.name) || folderName || "Projet Scanné";
-      var pDesc = (pkg && pkg.description) || "Projet local scanné le " + new Date().toLocaleDateString("fr-FR");
-      var npmCmds = [];
-      if (pkg && pkg.scripts) {
-        Object.keys(pkg.scripts).forEach(function(k) {
-          npmCmds.push({ name: k, cmd: "npm run " + k });
-        });
-      }
-
-      var fileTreeSummary = Object.keys(categories).map(function(c) {
-        return "### " + c + "\n" + categories[c].map(function(fp) { return "- " + fp; }).join("\n");
-      }).join("\n\n");
-
-      var tpl = "# Spec pour le projet " + pName + "\n\n## Description\n" + pDesc + "\n\n## Directives d'Agent IA\n- Développer en respectant l'architecture existante.\n- Exécuter la commande {{commande_test}} avant de valider.\n\n## Cartographie des Fichiers Scannées\n" + fileTreeSummary;
-      var s = {
-        id: uid(), nom: "Spec: " + pName, format: "claude-md",
-        description: pDesc, template: tpl, npmScripts: npmCmds,
-        values: { commande_test: npmCmds.length ? npmCmds[0].cmd : "npm test" },
-        majLe: new Date().toISOString()
-      };
-
-      state.specs.unshift(s);
-      state.sel = s.id;
-      sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-      toast("Dossier « " + pName + " » scanné et classé !");
-    });
-  }
-
-  document.getElementById("btn-scan").addEventListener("click", function () {
-    document.getElementById("dir").click();
-  });
-  document.getElementById("dir").addEventListener("change", function () {
-    var fichiers = this.files ? Array.prototype.slice.call(this.files) : [];
-    this.value = "";
-    if (fichiers.length) analyserDossier(fichiers);
-  });
-
-  /* ---------- ASSISTANT-COACH ---------- */
-  document.getElementById("btn-coach").addEventListener("click", function () {
-    document.getElementById("modal-coach").hidden = false;
-  });
-  document.getElementById("m-close-coach").addEventListener("click", function () {
-    document.getElementById("modal-coach").hidden = true;
-  });
-  document.getElementById("c-generate").addEventListener("click", function () {
-    var intentEl = document.getElementById("c-intent");
-    var areaEl = document.getElementById("c-area");
-    var depthEl = document.getElementById("c-depth");
-    var ideaText = document.getElementById("c-idea").value.trim() || "Demande d'évolution technique";
-
-    var intentText = intentEl.options[intentEl.selectedIndex].text;
-    var areaText = areaEl.options[areaEl.selectedIndex].text;
-
-    var s = {
-      id: uid(),
-      nom: "Brief: " + intentText + " (" + areaText.split("/")[0].trim() + ")",
-      format: "claude-md",
-      description: "Brief guidé généré le " + new Date().toLocaleDateString("fr-FR"),
-      template: "## Objectif\n" + intentText + " dans la zone « " + areaText + " ».\n\n## Description du Besoin\n" + ideaText + "\n\n## Contraintes à Respecter\n" +
-        (document.getElementById("c-existing").checked ? "- Préserver le comportement existant hors périmètre.\n" : "") +
-        (document.getElementById("c-responsive").checked ? "- Vérifier le rendu sur mobile et ordinateur.\n" : "") +
-        (document.getElementById("c-build").checked ? "- Valider la compilation via npm run build.\n" : "") +
-        (document.getElementById("c-confirm").checked ? "- Attendre ma confirmation avant de coder.\n" : "") +
-        "\n## Critères d'Acceptation\n- Le résultat demandé est visible et fonctionnel.\n- Aucune régression n'est introduite.",
-      values: {},
-      majLe: new Date().toISOString()
-    };
-
-    state.specs.unshift(s);
-    state.sel = s.id;
-    document.getElementById("modal-coach").hidden = true;
-    document.getElementById("c-idea").value = "";
-    sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-    toast("Nouveau brief guidé généré !");
-  });
-
-  /* ---------- CONFIGURATION IA ---------- */
-  var DEFAULT_MODELS = {
-    ollama: "llama3",
-    gemini: "gemini-2.0-flash",
-    mistral: "mistral-small-latest",
-    groq: "llama-3.3-70b-versatile",
-    openrouter: "deepseek/deepseek-r1:free"
-  };
-
-  document.getElementById("cfg-provider").addEventListener("change", function () {
-    var p = this.value;
-    if (DEFAULT_MODELS[p]) {
-      document.getElementById("cfg-model").value = DEFAULT_MODELS[p];
-    }
-  });
-
-  document.getElementById("btn-api-config").addEventListener("click", function () {
-    var prov = state.apiCfg.provider || "ollama";
-    document.getElementById("cfg-provider").value = prov;
-    document.getElementById("cfg-model").value = state.apiCfg.model || DEFAULT_MODELS[prov] || "llama3";
-    document.getElementById("cfg-key").value = state.apiCfg.key || "";
-    document.getElementById("modal-api").hidden = false;
-  });
-  document.getElementById("m-close-api").addEventListener("click", function () {
-    document.getElementById("modal-api").hidden = true;
-  });
-  document.getElementById("cfg-save").addEventListener("click", function () {
-    state.apiCfg.provider = document.getElementById("cfg-provider").value;
-    state.apiCfg.model = document.getElementById("cfg-model").value.trim();
-    state.apiCfg.key = document.getElementById("cfg-key").value.trim();
-    sauver();
-    document.getElementById("modal-api").hidden = true;
-    toast("Configuration IA enregistrée (" + state.apiCfg.provider + ") !");
-    if (state.sel) renderDetail();
-  });
-
-  /* ---------- GALERIE ---------- */
-  function renderGallery() {
-    var gl = document.getElementById("gallery-list"); if (!gl) return;
-    gl.innerHTML = PRESETS.map(function (p, idx) {
-      return "<div class='preset-card' data-preset-idx='" + idx + "'>" +
-        "<div class='preset-title'>" + esc(p.nom) + "</div>" +
-        "<div class='preset-desc'>" + esc(p.description) + "</div>" +
-        "<button class='btn btn-primary' style='height:28px; font-size:12px;'>Utiliser ce modèle</button>" +
-      "</div>";
-    }).join("");
-  }
-  document.getElementById("btn-gallery").addEventListener("click", function () {
-    renderGallery(); document.getElementById("modal-gallery").hidden = false;
-  });
-  document.getElementById("m-close-gallery").addEventListener("click", function () {
-    document.getElementById("modal-gallery").hidden = true;
-  });
-  document.getElementById("modal-gallery").addEventListener("click", function (e) {
-    if (e.target === this) document.getElementById("modal-gallery").hidden = true;
-    var card = e.target.closest("[data-preset-idx]");
-    if (card) {
-      var idx = +card.getAttribute("data-preset-idx");
-      var p = PRESETS[idx];
-      if (p) {
-        var s = {
-          id: uid(), nom: p.nom, format: p.format, description: p.description,
-          template: p.template, values: JSON.parse(JSON.stringify(p.values || {})), majLe: new Date().toISOString()
-        };
-        state.specs.unshift(s);
-        state.sel = s.id; state.filtreFmt = "tous"; state.q = "";
-        document.getElementById("q").value = "";
-        document.getElementById("modal-gallery").hidden = true;
-        document.getElementById("app").classList.add("open");
-        sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-        toast("Modèle « " + p.nom + " » ajouté !");
-      }
-    }
-  });
-
-  document.getElementById("filters").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-fmt]"); if (!b) return;
-    state.filtreFmt = b.getAttribute("data-fmt");
-    renderFiltres(); renderListe();
-  });
-
+  /* Listeners Global */
   document.getElementById("list").addEventListener("click", function (e) {
     var c = e.target.closest(".card"); if (!c) return;
     state.sel = c.getAttribute("data-id");
@@ -1222,59 +486,94 @@
     renderListe(); renderDetail();
   });
 
+  document.getElementById("go-home").addEventListener("click", function () {
+    state.sel = null; renderListe(); renderHome();
+  });
+
   document.getElementById("q").addEventListener("input", function () {
     state.q = this.value; renderListe();
   });
 
-  document.getElementById("btn-new").addEventListener("click", function () {
+  document.getElementById("detail").addEventListener("click", function (e) {
+    var qc = e.target.closest("[data-preset-index]"); if (!qc) return;
+    var idx = +qc.getAttribute("data-preset-index");
+    var p = PRESETS[idx];
+    if (p) {
+      state.sel = p.id;
+      document.getElementById("app").classList.add("open");
+      renderListe(); renderDetail();
+    }
+  });
+
+  /* Modals */
+  document.getElementById("btn-coach").addEventListener("click", function () { document.getElementById("modal-coach").hidden = false; });
+  document.getElementById("m-close-coach").addEventListener("click", function () { document.getElementById("modal-coach").hidden = true; });
+
+  document.getElementById("c-generate").addEventListener("click", function () {
+    var intent = document.getElementById("c-intent").value;
+    var area = document.getElementById("c-area").value;
+    var idea = document.getElementById("c-idea").value.trim() || "Mon besoin...";
+
     var s = {
-      id: uid(), nom: "Nouvelle Spec Agent", format: "claude-md",
-      description: "", template: "# Spec pour {{agent_role}}\n\n## Directives\n- {{directive_1}}",
-      values: { agent_role: "MonAgent", directive_1: "Format propre" }, majLe: new Date().toISOString()
+      id: uid(), icon: "🧠", nom: "Demande " + intent, desc: area,
+      template: "Tu es un développeur expert.\n\nObjectif : " + intent + " dans la section " + area + ".\n\nDescription du besoin :\n" + idea + "\n\nContraintes :\n- Conserver le code existant.\n- Rendre le résultat clair et testable.",
+      values: {}
     };
-    state.specs.unshift(s);
-    state.sel = s.id; state.filtreFmt = "tous"; state.q = "";
-    document.getElementById("q").value = "";
-    document.getElementById("app").classList.add("open");
-    sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-    var n = document.getElementById("f-nom"); if (n) n.focus();
+    state.specs.unshift(s); state.sel = s.id;
+    document.getElementById("modal-coach").hidden = true;
+    document.getElementById("c-idea").value = "";
+    sauver(); renderListe(); renderDetail();
+    toast("✨ Nouvelle demande créée !");
   });
 
-  document.getElementById("btn-export").addEventListener("click", function () {
-    var data = JSON.stringify({ v: 1, specs: state.specs }, null, 2);
-    var blob = new Blob([data], { type: "application/json" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "promptforge-specs.json";
-    document.body.appendChild(a); a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-    toast("Sauvegarde JSON téléchargée.");
+  document.getElementById("btn-gallery").addEventListener("click", function () {
+    var gl = document.getElementById("gallery-list");
+    gl.innerHTML = PRESETS.map(function (p, i) {
+      return "<div class='q-card' data-gallery-idx='" + i + "'>" +
+        "<div class='q-icon'>" + p.icon + "</div>" +
+        "<div><div class='q-name'>" + esc(p.nom) + "</div><div class='q-sub'>" + esc(p.desc) + "</div></div>" +
+      "</div>";
+    }).join("");
+    document.getElementById("modal-gallery").hidden = false;
   });
 
-  document.getElementById("btn-import").addEventListener("click", function () { document.getElementById("file").click(); });
-  document.getElementById("file").addEventListener("change", function () {
-    var file = this.files && this.files[0];
-    if (!file) return;
-    var r = new FileReader();
-    r.onload = function () {
-      try {
-        var d = JSON.parse(String(r.result));
-        if (d && Array.isArray(d.specs)) {
-          state.specs = d.specs;
-          sauver(); renderStats(); renderFiltres(); renderListe(); renderDetail();
-          toast("Specs importées avec succès.");
-        }
-      } catch (e) { toast("Fichier JSON invalide."); }
-    };
-    r.readAsText(file);
+  document.getElementById("m-close-gallery").addEventListener("click", function () { document.getElementById("modal-gallery").hidden = true; });
+
+  document.getElementById("modal-gallery").addEventListener("click", function (e) {
+    var card = e.target.closest("[data-gallery-idx]"); if (!card) return;
+    var idx = +card.getAttribute("data-gallery-idx");
+    var p = PRESETS[idx];
+    if (p) {
+      var s = { id: uid(), icon: p.icon, nom: p.nom, desc: p.desc, template: p.template, values: JSON.parse(JSON.stringify(p.values || {})) };
+      state.specs.unshift(s); state.sel = s.id;
+      document.getElementById("modal-gallery").hidden = true;
+      sauver(); renderListe(); renderDetail();
+      toast("✨ Modèle « " + p.nom + " » ajouté !");
+    }
+  });
+
+  /* Scanner Dossier */
+  document.getElementById("btn-scan").addEventListener("click", function () { document.getElementById("dir").click(); });
+  document.getElementById("dir").addEventListener("change", function () {
+    var files = this.files ? Array.prototype.slice.call(this.files) : [];
     this.value = "";
+    if (files.length) {
+      var folderName = files[0].webkitRelativePath ? files[0].webkitRelativePath.split("/")[0] : "MonProjet";
+      var s = {
+        id: uid(), icon: "📁", nom: "Projet " + folderName, desc: files.length + " fichiers scannés",
+        template: "Tu es un développeur expert.\nAnalyse le projet {{nom_projet}} ({{nb_fichiers}} fichiers scannés).\n\nObjectif :\nDevelopper les fonctionnalités en respectant la structure du projet.",
+        values: { nom_projet: folderName, nb_fichiers: String(files.length) }
+      };
+      state.specs.unshift(s); state.sel = s.id;
+      sauver(); renderListe(); renderDetail();
+      toast("📁 Dossier « " + folderName + " » scanné !");
+    }
   });
 
-  /* ---------- Démarrage ---------- */
+  /* Démarrage */
   charger();
-  renderStats(); renderFiltres(); renderListe();
-  if (state.specs.length > 0) state.sel = state.specs[0].id;
-  renderDetail();
+  renderListe();
+  renderHome();
 })();
 </script>
 </body>
