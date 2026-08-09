@@ -725,7 +725,20 @@
       btn.addEventListener("click", function () {
         var cmd = btn.getAttribute("data-copy-cmd");
         if (navigator.clipboard) navigator.clipboard.writeText(cmd);
-        toast("Commande copiée : " + cmd);
+
+        fetch("http://localhost:3737/run-command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ command: cmd })
+        }).then(function(res) { return res.json(); }).then(function(data) {
+          if (data && data.status === "started") {
+            toast("\ud83d\ude80 Terminal ancr\u00e9 lanc\u00e9 : " + cmd);
+          } else {
+            toast("Commande copi\u00e9e : " + cmd);
+          }
+        }).catch(function() {
+          toast("Commande copi\u00e9e ! (Lance 'node server.js' pour l'ex\u00e9cuter en 1 clic)");
+        });
       });
     });
 
