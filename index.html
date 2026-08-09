@@ -177,7 +177,7 @@
   }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
-  /* Modals simples */
+  /* Modals */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
   .modal-overlay[hidden] { display: none; }
   .modal-card { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); width: min(680px, 100%); padding: 24px; max-height: 90vh; overflow-y: auto; }
@@ -205,6 +205,7 @@
       <button class="btn btn-primary" id="btn-coach">🧠 Créer une demande guidée</button>
       <button class="btn" id="btn-gallery">💡 Modèles prêts</button>
       <button class="btn" id="btn-scan" title="Scanner un dossier projet">📁 Scanner dossier</button>
+      <button class="btn" id="btn-open-api" title="Configurer l'IA (Gemini / Mistral / Ollama / Groq)">⚙️ Clés IA</button>
     </div>
   </header>
 
@@ -277,6 +278,37 @@
   </div>
 </div>
 
+<!-- Modal Configuration IA -->
+<div class="modal-overlay" id="modal-api" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>⚙️ Configuration de l'IA (Direct dans PromptForge)</h3>
+      <button class="btn btn-ghost" id="m-close-api">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="lbl">Fournisseur d'IA</label>
+      <select class="field" id="cfg-provider">
+        <option value="gemini">🌟 Google Gemini API (gemini-2.0-flash)</option>
+        <option value="mistral">🇫🇷 Mistral AI (mistral-small-latest)</option>
+        <option value="ollama">🦙 Ollama Local (http://localhost:11434) — Gratuit & Hors-ligne</option>
+        <option value="groq">⚡ Groq Free API (llama-3.3-70b-versatile)</option>
+        <option value="openrouter">🌐 OpenRouter Free (deepseek-r1:free)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="lbl">Modèle IA</label>
+      <input class="field" id="cfg-model" placeholder="ex: gemini-2.0-flash, mistral-small-latest, llama3...">
+    </div>
+    <div class="form-group">
+      <label class="lbl">Clé API (Inutile pour Ollama Local)</label>
+      <input class="field" id="cfg-key" type="password" placeholder="Collez votre clé API si nécessaire...">
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-primary" id="cfg-save">Enregistrer la Configuration</button>
+    </div>
+  </div>
+</div>
+
 <input type="file" id="dir" webkitdirectory directory multiple hidden>
 
 <script>
@@ -284,6 +316,15 @@
   "use strict";
 
   var KEY = "promptforge.simple.v1";
+  var KEY_API = "promptforge.api_config.v1";
+
+  var DEFAULT_MODELS = {
+    gemini: "gemini-2.0-flash",
+    mistral: "mistral-small-latest",
+    ollama: "llama3",
+    groq: "llama-3.3-70b-versatile",
+    openrouter: "deepseek/deepseek-r1:free"
+  };
 
   var PRESETS = [
     {
@@ -320,7 +361,10 @@
     }
   ];
 
-  var state = { specs: [], sel: null, q: "" };
+  var state = {
+    specs: [], sel: null, q: "",
+    apiCfg: { provider: "gemini", model: "gemini-2.0-flash", key: "" }
+  };
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -338,6 +382,11 @@
         var d = JSON.parse(raw);
         if (d && Array.isArray(d.specs) && d.specs.length > 0) state.specs = d.specs;
       }
+      var rawApi = localStorage.getItem(KEY_API);
+      if (rawApi) {
+        var cfg = JSON.parse(rawApi);
+        if (cfg) state.apiCfg = cfg;
+      }
     } catch (e) {}
     if (!state.specs.length) {
       state.specs = PRESETS.map(function (p) {
@@ -348,7 +397,10 @@
   }
 
   function sauver() {
-    try { localStorage.setItem(KEY, JSON.stringify({ specs: state.specs })); } catch (e) {}
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ specs: state.specs }));
+      localStorage.setItem(KEY_API, JSON.stringify(state.apiCfg));
+    } catch (e) {}
   }
 
   function detectVars(tpl) {
@@ -386,12 +438,12 @@
     var d = document.getElementById("detail");
     d.innerHTML = "<div class='welcome-box'>" +
       "<h2>Bienvenue sur PromptForge 👋</h2>" +
-      "<p>L'outil le plus simple pour créer des demandes parfaites et obtenir d'excellentes réponses des IAs (Claude, ChatGPT, Gemini...).</p>" +
+      "<p>L'outil le plus simple pour créer des demandes parfaites et tester directement avec l'IA.</p>" +
 
       "<div class='steps-grid'>" +
         "<div class='step-card'><div class='step-num'>ÉTAPE 1</div><div class='step-title'>Choisis un modèle</div><div class='step-desc'>Sélectionne un modèle prêt à l'emploi à gauche ou dans la galerie.</div></div>" +
         "<div class='step-card'><div class='step-num'>ÉTAPE 2</div><div class='step-title'>Remplis les cases</div><div class='step-desc'>Renseigne les quelques informations demandées dans le formulaire.</div></div>" +
-        "<div class='step-card'><div class='step-num'>ÉTAPE 3</div><div class='step-title'>Copie ton texte</div><div class='step-desc'>Clique sur Copier et colle le résultat directement à ton IA !</div></div>" +
+        "<div class='step-card'><div class='step-num'>ÉTAPE 3</div><div class='step-title'>Copie ou Teste</div><div class='step-desc'>Copie le texte ou teste-le en direct avec Gemini / Mistral / Ollama !</div></div>" +
       "</div>" +
 
       "<h3 style='font-family:var(--display); font-size:22px; text-align:left; margin-bottom:16px;'>Exemples populaires à essayer :</h3>" +
@@ -413,6 +465,7 @@
 
     var vars = detectVars(s.template);
     var compiled = compileSpec(s);
+    var provName = state.apiCfg.provider || "IA";
 
     var h = "<div class='detail-inner'>";
     h += "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;'>" +
@@ -437,12 +490,21 @@
     }
 
     h += "<div class='form-group'>" +
-           "<span class='lbl'>Votre Texte Prêt à l'Emploi pour l'IA</span>" +
+           "<span class='lbl'>Votre Texte Prêt à l'Emploi</span>" +
            "<div class='preview-card' id='preview-box'>" + esc(compiled) + "</div>" +
          "</div>";
 
-    h += "<div style='display:flex; gap:12px;'>" +
-           "<button class='btn btn-primary' id='btn-copy' style='flex:1; height:46px; font-size:15px; justify-content:center;'>📋 Copier ce texte pour l'IA</button>" +
+    h += "<div style='display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;'>" +
+           "<button class='btn btn-primary' id='btn-copy' style='flex:1; min-width:200px; height:46px; font-size:15px; justify-content:center;'>📋 Copier ce texte</button>" +
+           "<button class='btn' id='btn-run-ai' style='height:46px; font-size:14.5px; border-color:var(--accent); color:var(--accent-ink); font-weight:600;'>▶ Tester avec l'IA (" + esc(provName) + ")</button>" +
+         "</div>";
+
+    h += "<div id='ai-response-area' hidden style='border:1px solid var(--accent); background:var(--surface-2); border-radius:var(--r); padding:16px;'>" +
+           "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:600;'>" +
+             "<span>Réponse de " + esc(provName) + "</span>" +
+             "<button class='btn btn-ghost' id='ai-copy-btn' style='height:28px; font-size:12px;'>Copier la réponse</button>" +
+           "</div>" +
+           "<div id='ai-response-text' style='font-size:14px; line-height:1.6; white-space:pre-wrap; color:var(--ink);'></div>" +
          "</div>";
 
     h += "</div>";
@@ -467,6 +529,10 @@
       }
     });
 
+    document.getElementById("btn-run-ai").addEventListener("click", function () {
+      executerIA(s);
+    });
+
     document.getElementById("btn-del").addEventListener("click", function () {
       if (confirm("Supprimer ce modèle ?")) {
         state.specs = state.specs.filter(function (x) { return x.id !== s.id; });
@@ -476,6 +542,96 @@
 
     var back = document.getElementById("back");
     if (back) back.addEventListener("click", function () { document.getElementById("app").classList.remove("open"); });
+  }
+
+  function executerIA(spec) {
+    var area = document.getElementById("ai-response-area");
+    var txtEl = document.getElementById("ai-response-text");
+    if (!area || !txtEl) return;
+
+    var p = String(state.apiCfg.provider || "").trim().toLowerCase();
+    var key = String(state.apiCfg.key || "").trim();
+    var model = String(state.apiCfg.model || "").trim();
+
+    if (!p || (p !== "ollama" && !key)) {
+      document.getElementById("modal-api").hidden = false;
+      toast("Veuillez d'abord configurer votre clé API.");
+      return;
+    }
+
+    area.hidden = false;
+    txtEl.textContent = "Connexion à " + p + " (" + (model || "défaut") + ")...";
+    var promptCompile = compileSpec(spec);
+
+    if (p.indexOf("gemini") !== -1 || p.indexOf("google") !== -1) {
+      var geminiModel = model || "gemini-2.0-flash";
+      var geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + geminiModel + ":generateContent?key=" + encodeURIComponent(key);
+
+      fetch(geminiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: promptCompile }] }] })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+          txtEl.textContent = data.candidates[0].content.parts.map(function(pt) { return pt.text; }).join("\n");
+          toast("✨ Réponse Gemini reçue !");
+        } else if (data.error) {
+          txtEl.textContent = "❌ Erreur Gemini : " + data.error.message;
+        } else {
+          txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
+        }
+      }).catch(function(err) {
+        txtEl.textContent = "❌ Erreur de réseau vers Gemini : " + err.message;
+      });
+    } else if (p.indexOf("mistral") !== -1) {
+      var mistralModel = model || "mistral-small-latest";
+      fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
+        body: JSON.stringify({ model: mistralModel, messages: [{ role: "user", content: promptCompile }] })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+          txtEl.textContent = data.choices[0].message.content;
+          toast("✨ Réponse Mistral reçue !");
+        } else {
+          txtEl.textContent = "❌ Erreur Mistral : " + (data.message || JSON.stringify(data));
+        }
+      }).catch(function(err) {
+        txtEl.textContent = "❌ Erreur de réseau vers Mistral : " + err.message;
+      });
+    } else if (p.indexOf("ollama") !== -1) {
+      fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: model || "llama3", prompt: promptCompile, stream: false })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        txtEl.textContent = data.response || "Aucune réponse d'Ollama.";
+        toast("✨ Réponse Ollama reçue !");
+      }).catch(function(err) {
+        txtEl.textContent = "❌ Ollama hors-ligne (Vérifie http://localhost:11434).";
+      });
+    } else if (p.indexOf("groq") !== -1 || p.indexOf("openrouter") !== -1) {
+      var url = p.indexOf("groq") !== -1 ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
+        body: JSON.stringify({ model: model || (p.indexOf("groq") !== -1 ? "llama-3.3-70b-versatile" : "deepseek/deepseek-r1:free"), messages: [{ role: "user", content: promptCompile }] })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (data.choices && data.choices[0]) {
+          txtEl.textContent = data.choices[0].message.content;
+          toast("✨ Réponse reçue !");
+        } else {
+          txtEl.textContent = "Erreur : " + JSON.stringify(data);
+        }
+      }).catch(function(err) {
+        txtEl.textContent = "Erreur : " + err.message;
+      });
+    }
+
+    document.getElementById("ai-copy-btn").onclick = function() {
+      if (navigator.clipboard) navigator.clipboard.writeText(txtEl.textContent);
+      toast("Réponse IA copiée !");
+    };
   }
 
   /* Listeners Global */
@@ -550,6 +706,32 @@
       sauver(); renderListe(); renderDetail();
       toast("✨ Modèle « " + p.nom + " » ajouté !");
     }
+  });
+
+  /* Configuration API Modal */
+  document.getElementById("cfg-provider").addEventListener("change", function () {
+    var p = this.value;
+    if (DEFAULT_MODELS[p]) document.getElementById("cfg-model").value = DEFAULT_MODELS[p];
+  });
+
+  document.getElementById("btn-open-api").addEventListener("click", function () {
+    var prov = state.apiCfg.provider || "gemini";
+    document.getElementById("cfg-provider").value = prov;
+    document.getElementById("cfg-model").value = state.apiCfg.model || DEFAULT_MODELS[prov] || "gemini-2.0-flash";
+    document.getElementById("cfg-key").value = state.apiCfg.key || "";
+    document.getElementById("modal-api").hidden = false;
+  });
+
+  document.getElementById("m-close-api").addEventListener("click", function () { document.getElementById("modal-api").hidden = true; });
+
+  document.getElementById("cfg-save").addEventListener("click", function () {
+    state.apiCfg.provider = document.getElementById("cfg-provider").value;
+    state.apiCfg.model = document.getElementById("cfg-model").value.trim();
+    state.apiCfg.key = document.getElementById("cfg-key").value.trim();
+    sauver();
+    document.getElementById("modal-api").hidden = true;
+    toast("✨ Configuration enregistrée (" + state.apiCfg.provider + ") !");
+    if (state.sel) renderDetail();
   });
 
   /* Scanner Dossier */
