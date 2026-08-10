@@ -223,7 +223,7 @@
   /* Modals Full Responsive */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
   .modal-overlay[hidden] { display: none; }
-  .modal-card { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); width: min(720px, 100%); padding: 28px; max-height: 90vh; overflow-y: auto; }
+  .modal-card { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); width: min(760px, 100%); padding: 28px; max-height: 90vh; overflow-y: auto; }
   .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .modal-head h3 { font-family: var(--display); font-size: 24px; margin: 0; font-weight: 600; }
 
@@ -279,6 +279,9 @@
     <!-- Desktop Menu Bar -->
     <div class="desktop-btns">
       <button class="btn btn-primary" id="btn-coach">🧠 Demande guidée</button>
+      <button class="btn" id="btn-reverse">🔄 Reverse Prompt</button>
+      <button class="btn" id="btn-chain">🔗 Workflows Chaînés</button>
+      <button class="btn" id="btn-git-tools">⚡ Git &amp; PR Tools</button>
       <button class="btn" id="btn-skills">📦 Skills Pro</button>
       <button class="btn" id="btn-wireframe">🎨 Wireframe</button>
       <button class="btn" id="btn-gallery">💡 Modèles</button>
@@ -324,13 +327,25 @@
         <span class="m-menu-icon">📲</span>
         <div><div>Installer l'Application PWA</div><div style="font-size:12px; color:var(--accent); font-weight:normal;">Ajouter à l'écran d'accueil</div></div>
       </button>
+      <button class="m-menu-item" id="mob-act-reverse">
+        <span class="m-menu-icon">🔄</span>
+        <div><div>Reverse Prompt Engineering</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Extraire le prompt depuis du code/texte</div></div>
+      </button>
+      <button class="m-menu-item" id="mob-act-chain">
+        <span class="m-menu-icon">🔗</span>
+        <div><div>Workflows &amp; Prompts Chaînés</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Exécuter des séquences multi-étapes</div></div>
+      </button>
+      <button class="m-menu-item" id="mob-act-git-tools">
+        <span class="m-menu-icon">⚡</span>
+        <div><div>Outils Git, PR &amp; README</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Générer des commits et docs GitHub</div></div>
+      </button>
       <button class="m-menu-item" id="mob-act-coach">
         <span class="m-menu-icon">🧠</span>
         <div><div>Créer une Demande Guidée</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Répondre à 2 questions simples</div></div>
       </button>
       <button class="m-menu-item" id="mob-act-skills">
         <span class="m-menu-icon">📦</span>
-        <div><div>Mes Skills Pro & Import</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Empiler des compétences d'experts</div></div>
+        <div><div>Mes Skills Pro &amp; Import</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Empiler des compétences d'experts</div></div>
       </button>
       <button class="m-menu-item" id="mob-act-wireframe">
         <span class="m-menu-icon">🎨</span>
@@ -346,8 +361,108 @@
       </button>
       <button class="m-menu-item" id="mob-act-api">
         <span class="m-menu-icon">⚙️</span>
-        <div><div>Configuration IA & Clés API</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Gemini, Mistral, Ollama...</div></div>
+        <div><div>Configuration IA &amp; Clés API</div><div style="font-size:12px; color:var(--muted); font-weight:normal;">Gemini, Mistral, Ollama...</div></div>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 3: Reverse Prompt Engineering -->
+<div class="modal-overlay" id="modal-reverse" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>🔄 Reverse Prompt Engineering</h3>
+      <button class="btn btn-ghost" id="m-close-reverse">✕</button>
+    </div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">Collez du code, un texte ou chargez un fichier : l'IA va analyser le résultat et reconstituer le prompt parfait qui a permis de le créer !</p>
+
+    <div class="form-group">
+      <label class="lbl">Code ou Texte Source</label>
+      <textarea class="field" id="rev-code-input" rows="6" placeholder="Collez votre code HTML, JS, CSS, Python ou texte ici..."></textarea>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+      <label class="btn" style="cursor:pointer;">
+        📁 Fichier source (.js, .html, .py, .md)
+        <input type="file" id="rev-file-input" accept=".js,.html,.css,.py,.json,.md,.txt" hidden>
+      </label>
+      <button class="btn btn-primary" id="rev-submit-btn">🔍 Extraire le Prompt Origine avec l'IA</button>
+    </div>
+
+    <div id="rev-result-area" hidden style="border:1px solid var(--accent); background:var(--surface-2); border-radius:var(--r); padding:16px;">
+      <div style="font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:600; margin-bottom:10px;">✨ Prompt Reconstruit par l'IA :</div>
+      <div id="rev-output-box" style="font-family:var(--mono); font-size:13px; line-height:1.6; white-space:pre-wrap; color:var(--ink); margin-bottom:16px;"></div>
+      <button class="btn btn-primary" id="rev-save-spec-btn">💾 Enregistrer ce Prompt Reconstruit dans mes Modèles</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 4: Workflows & Prompts en Chaîne -->
+<div class="modal-overlay" id="modal-chain" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>🔗 Workflows &amp; Prompts en Chaîne</h3>
+      <button class="btn btn-ghost" id="m-close-chain">✕</button>
+    </div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">Exécutez des séquences multi-étapes automatisées où la réponse de chaque étape alimente l'étape suivante :</p>
+
+    <div class="form-group">
+      <label class="lbl">Choisir un Workflow Automatisé</label>
+      <select class="field" id="chain-select">
+        <option value="web-app">🚀 Workflow Web Complete (HTML -> CSS Glassmorphic -> JS Logique)</option>
+        <option value="code-audit">🔍 Workflow Audit & Securite (Analyse Logs -> Correction -> Tests)</option>
+        <option value="redaction">✍️ Workflow Redaction (Brouillon -> Amelioration Style -> Traduction Anglais)</option>
+      </select>
+    </div>
+
+    <div id="chain-steps-preview" style="background:var(--accent-wash); border:1px solid var(--accent); border-radius:var(--r); padding:16px; margin-bottom:20px;">
+      <div style="font-weight:600; color:var(--accent-ink); margin-bottom:8px; font-size:13.5px;">Séquence des Étapes :</div>
+      <div id="chain-steps-list" style="font-size:13px; color:var(--ink-2); line-height:1.6;"></div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-bottom:20px;">
+      <button class="btn btn-primary" id="chain-run-btn" style="height:44px; font-size:14.5px;">▶ Exécuter le Workflow Complet</button>
+    </div>
+
+    <div id="chain-results-area" hidden style="border:1px solid var(--line-strong); background:var(--surface-2); border-radius:var(--r); padding:16px;">
+      <div style="font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:600; margin-bottom:12px;">📊 Progression &amp; Résultats du Workflow :</div>
+      <div id="chain-results-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 5: Outils Git, PR & README -->
+<div class="modal-overlay" id="modal-git-tools" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>⚡ Générateur Git Commit, PR &amp; README</h3>
+      <button class="btn btn-ghost" id="m-close-git">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label class="lbl">Type d'Outil Git</label>
+      <select class="field" id="git-tool-type">
+        <option value="commit">📝 Message de Commit Conventional (feat, fix, docs...)</option>
+        <option value="pr">🔀 Description de Pull Request (PR) GitHub Structurée</option>
+        <option value="readme">📖 Fichier README.md Professionnel complet</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="lbl">Détails ou modifications apportées</label>
+      <textarea class="field" id="git-tool-desc" rows="4" placeholder="Expliquez ce qui a changé (ex: Ajout du bouton d'export PDF, correction du bug de thème sombre sur mobile...)"></textarea>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-bottom:20px;">
+      <button class="btn btn-primary" id="git-generate-btn">✨ Générer le document Git</button>
+    </div>
+
+    <div id="git-result-area" hidden style="border:1px solid var(--accent); background:var(--surface-2); border-radius:var(--r); padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:600;">
+        <span>Résultat Git Généré</span>
+        <button class="btn btn-ghost" id="git-copy-btn" style="height:28px; font-size:12px;">📋 Copier</button>
+      </div>
+      <div id="git-result-text" style="font-family:var(--mono); font-size:13px; line-height:1.6; white-space:pre-wrap; color:var(--ink);"></div>
     </div>
   </div>
 </div>
@@ -356,7 +471,7 @@
 <div class="modal-overlay" id="modal-skills" hidden>
   <div class="modal-card">
     <div class="modal-head">
-      <h3>📦 Importateur & Hub de Skills Pro</h3>
+      <h3>📦 Importateur &amp; Hub de Skills Pro</h3>
       <button class="btn btn-ghost" id="m-close-skills">✕</button>
     </div>
     <p style="font-size:14px; color:var(--muted); margin-bottom:14px;">Importez n'importe quel Skill ou System Prompt récupéré ailleurs (GitHub, Reddit, Twitter, fichiers `.md`) :</p>
@@ -574,10 +689,29 @@
     }
   ];
 
+  var WORKFLOW_DEFINITIONS = {
+    "web-app": [
+      { step: 1, name: "1. Structure HTML5", prompt: "Crée uniquement la structure HTML5 propre et sémantique pour une application web moderne intégrée." },
+      { step: 2, name: "2. Styles CSS Glassmorphic Responsive", prompt: "À partir de la structure HTML ci-dessus, génère le code CSS3 moderne (Glassmorphism, variables CSS, Dark Mode, 100% responsive)." },
+      { step: 3, name: "3. Logique JavaScript", prompt: "Génère maintenant le script JavaScript vanilla sans framework pour gérer toutes les interactions utilisateur et le state local." }
+    ],
+    "code-audit": [
+      { step: 1, name: "1. Analyse des Failles & Logs", prompt: "Analyse le code fourni pour détecter les failles de sécurité, les bugs potentiels et les goulots d'étranglement de performance." },
+      { step: 2, name: "2. Refactoring & Correctifs", prompt: "Fournis la version corrigée et optimisée du code en expliquant chaque changement apporté." },
+      { step: 3, name: "3. Tests Unitaires", prompt: "Rédige les tests unitaires complets pour valider tous les cas d'utilisation et cas limites du code corrigé." }
+    ],
+    "redaction": [
+      { step: 1, name: "1. Brouillon Structuré", prompt: "Rédige un premier brouillon structuré et percutant du texte." },
+      { step: 2, name: "2. Optimisation du Style & Ton", prompt: "Améliore le style du brouillon pour le rendre ultra-professionnel et fluide." },
+      { step: 3, name: "3. Traduction Anglais Pro", prompt: "Traduis l'ensemble du texte final en anglais britannique professionnel." }
+    ]
+  };
+
   var state = {
     specs: [], sel: null, q: "",
     apiCfg: { provider: "gemini", model: "gemini-1.5-flash", key: "" },
     customSkills: [],
+    lastReconstructedPrompt: "",
     wf: { navbar: true, hero: true, cards: true, form: false, table: false, footer: false }
   };
 
@@ -616,6 +750,9 @@
   document.getElementById("mob-act-gallery").addEventListener("click", function() { mobMenu.hidden = true; renderGallery(); document.getElementById("modal-gallery").hidden = false; });
   document.getElementById("mob-act-scan").addEventListener("click", function() { mobMenu.hidden = true; document.getElementById("dir").click(); });
   document.getElementById("mob-act-api").addEventListener("click", function() { mobMenu.hidden = true; document.getElementById("modal-api").hidden = false; });
+  document.getElementById("mob-act-reverse").addEventListener("click", function() { mobMenu.hidden = true; document.getElementById("modal-reverse").hidden = false; });
+  document.getElementById("mob-act-chain").addEventListener("click", function() { mobMenu.hidden = true; renderChainPreview(); document.getElementById("modal-chain").hidden = false; });
+  document.getElementById("mob-act-git-tools").addEventListener("click", function() { mobMenu.hidden = true; document.getElementById("modal-git-tools").hidden = false; });
 
   function charger() {
     try {
@@ -850,11 +987,7 @@
     if (back) back.addEventListener("click", function () { document.getElementById("app").classList.remove("open"); });
   }
 
-  function executerIA(spec) {
-    var area = document.getElementById("ai-response-area");
-    var txtEl = document.getElementById("ai-response-text");
-    if (!area || !txtEl) return;
-
+  function envoyerRequeteIA(promptTexte, callback) {
     var p = String(state.apiCfg.provider || "").trim().toLowerCase();
     var key = String(state.apiCfg.key || "").trim();
     var model = String(state.apiCfg.model || "").trim();
@@ -862,92 +995,240 @@
     if (!p || (p !== "ollama" && !key)) {
       document.getElementById("modal-api").hidden = false;
       toast("Veuillez d'abord configurer votre clé API.");
+      callback("❌ Clé API non configurée.", true);
       return;
     }
 
-    area.hidden = false;
-    txtEl.textContent = "Connexion à " + p + " (" + (model || "défaut") + ")...";
-    var promptCompile = compileSpec(spec);
-
     if (p.indexOf("gemini") !== -1 || p.indexOf("google") !== -1) {
       var geminiModel = model || "gemini-1.5-flash";
-
-      var tenterRequeteGemini = function(targetModel) {
-        var url = "https://generativelanguage.googleapis.com/v1beta/models/" + targetModel + ":generateContent?key=" + encodeURIComponent(key);
+      var tenter = function(m) {
+        var url = "https://generativelanguage.googleapis.com/v1beta/models/" + m + ":generateContent?key=" + encodeURIComponent(key);
         fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: promptCompile }] }] })
-        }).then(function(res) { return res.json(); }).then(function(data) {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: promptTexte }] }] })
+        }).then(function(res){ return res.json(); }).then(function(data){
           if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-            txtEl.textContent = data.candidates[0].content.parts.map(function(pt) { return pt.text; }).join("\n");
-            toast("✨ Réponse Gemini (" + targetModel + ") reçue !");
+            var txt = data.candidates[0].content.parts.map(function(pt){ return pt.text; }).join("\n");
+            callback(txt, false);
           } else if (data.error) {
-            if ((data.error.message || "").indexOf("limit: 0") !== -1 && targetModel !== "gemini-1.5-flash") {
-              txtEl.textContent = "🔄 Le modèle " + targetModel + " est restreint. Bascule automatique sur gemini-1.5-flash...";
-              tenterRequeteGemini("gemini-1.5-flash");
+            if ((data.error.message || "").indexOf("limit: 0") !== -1 && m !== "gemini-1.5-flash") {
+              tenter("gemini-1.5-flash");
             } else {
-              txtEl.textContent = "❌ Erreur Gemini (" + targetModel + ") : " + data.error.message;
+              callback("❌ Erreur Gemini : " + data.error.message, true);
             }
           } else {
-            txtEl.textContent = "Réponse Gemini : " + JSON.stringify(data);
+            callback(JSON.stringify(data), false);
           }
-        }).catch(function(err) {
-          txtEl.textContent = "❌ Erreur de réseau vers Gemini : " + err.message;
-        });
+        }).catch(function(err){ callback("❌ Erreur réseau : " + err.message, true); });
       };
-
-      tenterRequeteGemini(geminiModel);
+      tenter(geminiModel);
     } else if (p.indexOf("mistral") !== -1) {
-      var mistralModel = model || "mistral-small-latest";
       fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
-        body: JSON.stringify({ model: mistralModel, messages: [{ role: "user", content: promptCompile }] })
-      }).then(function(res) { return res.json(); }).then(function(data) {
+        method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
+        body: JSON.stringify({ model: model || "mistral-small-latest", messages: [{ role: "user", content: promptTexte }] })
+      }).then(function(res){ return res.json(); }).then(function(data){
         if (data.choices && data.choices[0] && data.choices[0].message) {
-          txtEl.textContent = data.choices[0].message.content;
-          toast("✨ Réponse Mistral reçue !");
+          callback(data.choices[0].message.content, false);
         } else {
-          txtEl.textContent = "❌ Erreur Mistral : " + (data.message || JSON.stringify(data));
+          callback("❌ Erreur Mistral : " + (data.message || JSON.stringify(data)), true);
         }
-      }).catch(function(err) {
-        txtEl.textContent = "❌ Erreur de réseau vers Mistral : " + err.message;
-      });
+      }).catch(function(err){ callback("❌ Erreur réseau : " + err.message, true); });
     } else if (p.indexOf("ollama") !== -1) {
       fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: model || "llama3", prompt: promptCompile, stream: false })
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        txtEl.textContent = data.response || "Aucune réponse d'Ollama.";
-        toast("✨ Réponse Ollama reçue !");
-      }).catch(function(err) {
-        txtEl.textContent = "❌ Ollama hors-ligne (Vérifie http://localhost:11434).";
-      });
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: model || "llama3", prompt: promptTexte, stream: false })
+      }).then(function(res){ return res.json(); }).then(function(data){
+        callback(data.response || "Aucune réponse d'Ollama.", false);
+      }).catch(function(err){ callback("❌ Ollama hors-ligne (Vérifie http://localhost:11434).", true); });
     } else if (p.indexOf("groq") !== -1 || p.indexOf("openrouter") !== -1) {
       var url = p.indexOf("groq") !== -1 ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions";
       fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
-        body: JSON.stringify({ model: model || (p.indexOf("groq") !== -1 ? "llama-3.3-70b-versatile" : "deepseek/deepseek-r1:free"), messages: [{ role: "user", content: promptCompile }] })
-      }).then(function(res) { return res.json(); }).then(function(data) {
+        method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
+        body: JSON.stringify({ model: model || (p.indexOf("groq") !== -1 ? "llama-3.3-70b-versatile" : "deepseek/deepseek-r1:free"), messages: [{ role: "user", content: promptTexte }] })
+      }).then(function(res){ return res.json(); }).then(function(data){
         if (data.choices && data.choices[0]) {
-          txtEl.textContent = data.choices[0].message.content;
-          toast("✨ Réponse reçue !");
+          callback(data.choices[0].message.content, false);
         } else {
-          txtEl.textContent = "Erreur : " + JSON.stringify(data);
+          callback("Erreur : " + JSON.stringify(data), true);
         }
-      }).catch(function(err) {
-        txtEl.textContent = "Erreur : " + err.message;
-      });
+      }).catch(function(err){ callback("Erreur : " + err.message, true); });
     }
+  }
+
+  function executerIA(spec) {
+    var area = document.getElementById("ai-response-area");
+    var txtEl = document.getElementById("ai-response-text");
+    if (!area || !txtEl) return;
+
+    var provName = state.apiCfg.provider || "IA";
+    area.hidden = false;
+    txtEl.textContent = "Connexion à " + provName + "...";
+    var promptCompile = compileSpec(spec);
+
+    envoyerRequeteIA(promptCompile, function(reponse, isError) {
+      txtEl.textContent = reponse;
+      if (!isError) toast("✨ Réponse " + provName + " reçue !");
+    });
 
     document.getElementById("ai-copy-btn").onclick = function() {
       if (navigator.clipboard) navigator.clipboard.writeText(txtEl.textContent);
       toast("Réponse IA copiée !");
     };
   }
+
+  /* Feature 3: Reverse Prompt Engineering */
+  document.getElementById("btn-reverse").addEventListener("click", function() {
+    document.getElementById("modal-reverse").hidden = false;
+  });
+  document.getElementById("m-close-reverse").addEventListener("click", function() {
+    document.getElementById("modal-reverse").hidden = true;
+  });
+
+  document.getElementById("rev-file-input").addEventListener("change", function() {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function() {
+      document.getElementById("rev-code-input").value = String(reader.result || "").trim();
+      toast("Fichier « " + file.name + " » chargé !");
+    };
+    reader.readAsText(file);
+    this.value = "";
+  });
+
+  document.getElementById("rev-submit-btn").addEventListener("click", function() {
+    var code = document.getElementById("rev-code-input").value.trim();
+    if (!code) { toast("Veuillez coller du code ou du texte source."); return; }
+
+    var resArea = document.getElementById("rev-result-area");
+    var outBox = document.getElementById("rev-output-box");
+    resArea.hidden = false;
+    outBox.textContent = "Analyse du code et reconstruction du prompt en cours...";
+
+    var metaPrompt = "Tu es un Master Prompt Engineer.\nAnalyse le code/texte suivant et génère le PROMPT RECONSTRUIT d'ingénierie (avec rôle expert, contexte, directives et contraintes) qui permet d'obtenir exactement ce résultat :\n\n" + code;
+
+    envoyerRequeteIA(metaPrompt, function(reponse, isError) {
+      outBox.textContent = reponse;
+      if (!isError) {
+        state.lastReconstructedPrompt = reponse;
+        toast("✨ Reverse Prompt généré avec succès !");
+      }
+    });
+  });
+
+  document.getElementById("rev-save-spec-btn").addEventListener("click", function() {
+    if (!state.lastReconstructedPrompt) return;
+    var s = {
+      id: uid(), icon: "🔄", nom: "Prompt Reconstruit", desc: "Issu de Reverse Engineering",
+      template: state.lastReconstructedPrompt, values: {}, activeSkills: ["skill-senior-dev"]
+    };
+    state.specs.unshift(s); state.sel = s.id;
+    document.getElementById("modal-reverse").hidden = true;
+    sauver(); renderListe(); renderDetail();
+    toast("✨ Nouveau modèle reconstruit sauvegardé !");
+  });
+
+  /* Feature 4: Workflows & Prompts Chaînés */
+  function renderChainPreview() {
+    var key = document.getElementById("chain-select").value;
+    var steps = WORKFLOW_DEFINITIONS[key] || [];
+    var container = document.getElementById("chain-steps-list");
+    container.innerHTML = steps.map(function(s) {
+      return "<div style='margin-bottom:4px;'><b>" + esc(s.name) + "</b>: " + esc(s.prompt) + "</div>";
+    }).join("");
+  }
+
+  document.getElementById("chain-select").addEventListener("change", renderChainPreview);
+
+  document.getElementById("btn-chain").addEventListener("click", function() {
+    renderChainPreview();
+    document.getElementById("modal-chain").hidden = false;
+  });
+  document.getElementById("m-close-chain").addEventListener("click", function() {
+    document.getElementById("modal-chain").hidden = true;
+  });
+
+  document.getElementById("chain-run-btn").addEventListener("click", function() {
+    var key = document.getElementById("chain-select").value;
+    var steps = WORKFLOW_DEFINITIONS[key] || [];
+    if (!steps.length) return;
+
+    var resArea = document.getElementById("chain-results-area");
+    var resContent = document.getElementById("chain-results-content");
+    resArea.hidden = false;
+    resContent.innerHTML = "<div style='color:var(--muted); font-size:13px;'>Lancement du workflow en 3 étapes...</div>";
+
+    var stepIndex = 0;
+    var accumulatedOutput = "";
+
+    function executerProchaineEtape() {
+      if (stepIndex >= steps.length) {
+        toast("🎉 Workflow complet terminé avec succès !");
+        return;
+      }
+      var currentStep = steps[stepIndex];
+      var stepDiv = document.createElement("div");
+      stepDiv.style.cssText = "margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:12px;";
+      stepDiv.innerHTML = "<div style='font-weight:600; color:var(--accent); margin-bottom:4px; font-size:13.5px;'>" + esc(currentStep.name) + " (En cours...)</div><div class='step-out' style='font-size:13px; font-family:var(--mono); white-space:pre-wrap;'>Chargement...</div>";
+      resContent.appendChild(stepDiv);
+
+      var promptChaine = currentStep.prompt;
+      if (accumulatedOutput) {
+        promptChaine += "\n\nContexte & Résultat des étapes précédentes :\n" + accumulatedOutput;
+      }
+
+      envoyerRequeteIA(promptChaine, function(reponse, isError) {
+        var outEl = stepDiv.querySelector(".step-out");
+        outEl.textContent = reponse;
+        stepDiv.querySelector("div").textContent = currentStep.name + " (Terminé ✓)";
+        if (!isError) {
+          accumulatedOutput += "\n\n--- [" + currentStep.name + "] ---\n" + reponse;
+          stepIndex++;
+          executerProchaineEtape();
+        }
+      });
+    }
+
+    executerProchaineEtape();
+  });
+
+  /* Feature 5: Outils Git Commit, PR & README */
+  document.getElementById("btn-git-tools").addEventListener("click", function() {
+    document.getElementById("modal-git-tools").hidden = false;
+  });
+  document.getElementById("m-close-git").addEventListener("click", function() {
+    document.getElementById("modal-git-tools").hidden = true;
+  });
+
+  document.getElementById("git-generate-btn").addEventListener("click", function() {
+    var type = document.getElementById("git-tool-type").value;
+    var desc = document.getElementById("git-tool-desc").value.trim() || "Modifications apportées au projet...";
+
+    var metaPrompt = "";
+    if (type === "commit") {
+      metaPrompt = "Tu es un expert Git. Génère 3 propositions de messages de commit Conventional Commits (feat, fix, refactor, docs) courts et professionnels basés sur cette description :\n" + desc;
+    } else if (type === "pr") {
+      metaPrompt = "Tu es un Lead Developer. Rédige une description complète et professionnelle de Pull Request (PR) GitHub au format Markdown avec les sections : Description, Changements clés, Verification & Tests, et Notes de mise en prod basées sur ceci :\n" + desc;
+    } else if (type === "readme") {
+      metaPrompt = "Tu es un Open Source maintainer. Génère un fichier README.md professionnel complet au format Markdown pour ce projet (avec Titre, Badges, Features, Installation, Usage, et License) basé sur ceci :\n" + desc;
+    }
+
+    var resArea = document.getElementById("git-result-area");
+    var resTxt = document.getElementById("git-result-text");
+    resArea.hidden = false;
+    resTxt.textContent = "Génération du document Git en cours...";
+
+    envoyerRequeteIA(metaPrompt, function(reponse, isError) {
+      resTxt.textContent = reponse;
+      if (!isError) toast("✨ Document Git généré !");
+    });
+  });
+
+  document.getElementById("git-copy-btn").addEventListener("click", function() {
+    var text = document.getElementById("git-result-text").textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(text);
+    toast("✨ Document Git copié !");
+  });
 
   /* Skills Hub Logic */
   function renderSkillsList() {
